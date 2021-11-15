@@ -2,7 +2,6 @@ package queues.arrays;
 
 import edu.princeton.cs.algs4.StdRandom;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -69,29 +68,30 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return result;
     }
 
+    public Iterator<Item> iterator(){
+        return new CustomIterator<>();
+    }
+    private class CustomIterator<Item> implements Iterator<Item>{
+        private Item[] itemsShuffl = (Item[]) new Object[size];
+        private int count = 0;
+        CustomIterator(){
+            System.arraycopy(items,0,itemsShuffl,0,size);
+            StdRandom.shuffle(itemsShuffl);
+        }
+        @Override
+        public boolean hasNext() {
+            return count < itemsShuffl.length;
+        }
 
-    public Iterator<Item> iterator() {
-        return new Iterator<Item>() {
-            private int count = 0;
-            private boolean[] elementIterate = new boolean[size];
-            @Override
-            public boolean hasNext() {
-                return count < size;
-            }
+        @Override
+        public Item next() {
+            return itemsShuffl[count++];
+        }
 
-            @Override
-            public Item next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-                return null;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException("Illegal operation");
-            }
-        };
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Illegal operation");
+        }
     }
 
     public static void main(String[] args) {
