@@ -1,5 +1,6 @@
 package queues.arrays;
 
+import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.Iterator;
@@ -7,7 +8,7 @@ import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
 
-    private final static int INITIAL_CAPACITY = 10;
+    private static final int INITIAL_CAPACITY = 10;
     private int size = 0;
     private Item[] items;
 
@@ -51,9 +52,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
         int numberOut = StdRandom.uniform(size);
         Item result = items[numberOut];
-        System.arraycopy(items, numberOut + 1, items, numberOut, size - numberOut - 1);
+        items[numberOut] = items[size - 1];
         items[--size] = null;
-        if (size * 4 <= items.length) {
+        if (size * 4 <= items.length && size * 4 > INITIAL_CAPACITY) {
             resize(false);
         }
         return result;
@@ -64,28 +65,34 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new NoSuchElementException();
         }
         int numberOut = StdRandom.uniform(size);
-        Item result = items[numberOut];
-        return result;
+        return items[numberOut];
     }
 
-    public Iterator<Item> iterator(){
+    public Iterator<Item> iterator() {
         return new CustomIterator<>();
     }
-    private class CustomIterator<Item> implements Iterator<Item>{
-        private Item[] itemsShuffl = (Item[]) new Object[size];
+
+    private class CustomIterator<Item> implements Iterator<Item> {
+        private final Item[] itemsShuffle;
         private int count = 0;
-        CustomIterator(){
-            System.arraycopy(items,0,itemsShuffl,0,size);
-            StdRandom.shuffle(itemsShuffl);
+
+        public CustomIterator() {
+            itemsShuffle = (Item[]) new Object[size()];
+            System.arraycopy(items, 0, itemsShuffle, 0, size());
+            StdRandom.shuffle(itemsShuffle);
         }
+
         @Override
         public boolean hasNext() {
-            return count < itemsShuffl.length;
+            return count < itemsShuffle.length;
         }
 
         @Override
         public Item next() {
-            return itemsShuffl[count++];
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return itemsShuffle[count++];
         }
 
         @Override
@@ -96,12 +103,29 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public static void main(String[] args) {
         RandomizedQueue<String> randomizedQueue = new RandomizedQueue<>();
-        randomizedQueue.size();
-        randomizedQueue.enqueue("it ");
-        randomizedQueue.enqueue("was ");
-        randomizedQueue.enqueue("amazing ");
-        randomizedQueue.enqueue("amazing12 ");
+        randomizedQueue.enqueue("it");
+        randomizedQueue.enqueue("was");
+        randomizedQueue.enqueue("amazing");
+        randomizedQueue.enqueue("amazing12");
+        StdOut.println(randomizedQueue.size());
+        StdOut.println(randomizedQueue.dequeue());
+        StdOut.println(randomizedQueue.sample());
+        for (String str : randomizedQueue
+        ) {
+            for (String str1 : randomizedQueue
+            ) {
+                StdOut.print(str + " + " + str1 + " ");
+            }
+            StdOut.println();
+        }
         randomizedQueue.dequeue();
+        randomizedQueue.dequeue();
+        randomizedQueue.dequeue();
+        randomizedQueue.enqueue("it");
+        randomizedQueue.enqueue("was");
+        randomizedQueue.dequeue();
+        randomizedQueue.dequeue();
+        randomizedQueue.enqueue("was");
         randomizedQueue.dequeue();
     }
 }

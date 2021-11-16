@@ -1,11 +1,9 @@
 package queues.linked;
 
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-/*Лучшее решение для двусторонней очереди будет связанный список,
-копирование элементов после удаления 1 ого будет занимать не постоянное время*/
-
 
 public class Deque<Item> implements Iterable<Item> {
 
@@ -13,7 +11,7 @@ public class Deque<Item> implements Iterable<Item> {
     private Node tail = null;
     private int count = 0;
 
-    class Node {
+    private class Node {
         public Item item;
         public Node prev;
         public Node next;
@@ -69,34 +67,46 @@ public class Deque<Item> implements Iterable<Item> {
         count++;
     }
 
-    public void removeFirst() {
+    public Item removeFirst() {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
+        Item temp = head.item;
         if (head.next == tail) {
             head = tail;
             head.next = null;
+            head.prev = null;
+        } else if (head == tail) {
+            head = null;
+            tail = null;
         } else {
             head = head.next;
+            head.prev = null;
         }
-        head.prev = null;
+        count--;
+        return temp;
     }
 
-    public void removeLast() {
+    public Item removeLast() {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        if (head == tail.prev) {
-            head = tail;
+        Item temp = tail.item;
+        if (tail.prev == head) {
+            tail = head;
             tail.prev = null;
+            tail.next = null;
+        } else if (head == tail) {
+            head = null;
+            tail = null;
         } else {
-
             tail = tail.prev;
+            tail.next = null;
         }
-        tail.next = null;
+        count--;
+        return temp;
     }
 
-    @Override
     public Iterator<Item> iterator() {
         return new Iterator<>() {
             private Node current = head;
@@ -108,12 +118,12 @@ public class Deque<Item> implements Iterable<Item> {
 
             @Override
             public Item next() {
-                if(!hasNext()){
+                if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                Node temp = current;
+                Item temp = current.item;
                 current = current.next;
-                return temp.item;
+                return temp;
             }
 
             @Override
@@ -122,6 +132,7 @@ public class Deque<Item> implements Iterable<Item> {
             }
         };
     }
+
 
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<>();
@@ -134,9 +145,25 @@ public class Deque<Item> implements Iterable<Item> {
         deque.removeFirst();
         deque.addLast(6);
         System.out.println(deque.size());
+        deque.removeLast();
+        deque.removeLast();
+        deque.removeLast();
+        deque.removeLast();
+        deque.addFirst(1);
+        deque.addLast(3);
+        deque.addFirst(2);
+        deque.addLast(4);
+        deque.removeFirst();
+        deque.removeFirst();
+        deque.removeFirst();
+        deque.removeFirst();
         for (Integer integer : deque
         ) {
-            System.out.println(integer);
+            for (Integer integer1 : deque
+            ) {
+                StdOut.print(integer + " " + integer1);
+            }
+            StdOut.println();
         }
     }
 }
