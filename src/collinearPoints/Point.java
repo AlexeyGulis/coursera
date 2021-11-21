@@ -11,7 +11,10 @@ package collinearPoints;
  ******************************************************************************/
 
 import java.util.Comparator;
+
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Point implements Comparable<Point> {
 
@@ -21,8 +24,8 @@ public class Point implements Comparable<Point> {
     /**
      * Initializes a new point.
      *
-     * @param  x the <em>x</em>-coordinate of the point
-     * @param  y the <em>y</em>-coordinate of the point
+     * @param x the <em>x</em>-coordinate of the point
+     * @param y the <em>y</em>-coordinate of the point
      */
     public Point(int x, int y) {
         /* DO NOT MODIFY */
@@ -57,12 +60,21 @@ public class Point implements Comparable<Point> {
      * Double.POSITIVE_INFINITY if the line segment is vertical;
      * and Double.NEGATIVE_INFINITY if (x0, y0) and (x1, y1) are equal.
      *
-     * @param  that the other point
+     * @param that the other point
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
         /* YOUR CODE HERE */
-        return 0.0;
+        if (this.x == that.x && this.y == that.y) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (this.x == that.x) {
+            return +0.0;
+        }
+        if (this.y == that.y) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return (double) (that.y - this.y) / (double) (that.x - this.x);
     }
 
     /**
@@ -70,21 +82,22 @@ public class Point implements Comparable<Point> {
      * Formally, the invoking point (x0, y0) is less than the argument point
      * (x1, y1) if and only if either y0 < y1 or if y0 = y1 and x0 < x1.
      *
-     * @param  that the other point
+     * @param that the other point
      * @return the value <tt>0</tt> if this point is equal to the argument
-     *         point (x0 = x1 and y0 = y1);
-     *         a negative integer if this point is less than the argument
-     *         point; and a positive integer if this point is greater than the
-     *         argument point
+     * point (x0 = x1 and y0 = y1);
+     * a negative integer if this point is less than the argument
+     * point; and a positive integer if this point is greater than the
+     * argument point
      */
     public int compareTo(Point that) {
         /* YOUR CODE HERE */
-        if(this.y < that.y){
+        if (this.y < that.y || (this.y == that.y && this.x < that.x)) {
             return -1;
-        }else if(this.y == that.y && this.x < that.x){
-            return -1;
+        } else if ((this.y == that.y && this.x > that.x) || this.y > that.y) {
+            return 1;
+        } else {
+            return 0;
         }
-        return 0;
     }
 
     /**
@@ -95,7 +108,19 @@ public class Point implements Comparable<Point> {
      */
     public Comparator<Point> slopeOrder() {
         /* YOUR CODE HERE */
-        return null;
+        Comparator<Point> comparator = new Comparator<Point>() {
+            @Override
+            public int compare(Point p1, Point p2) {
+                if (slopeTo(p1) < slopeTo(p2)) {
+                    return -1;
+                } else if (slopeTo(p1) > slopeTo(p2)) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+        return comparator;
     }
 
 
@@ -116,5 +141,33 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         /* YOUR CODE HERE */
+        /*check compareTo
+        Point p1 = new Point(1, 2);
+        Point p2 = new Point(1, 2);
+        StdOut.println(p1.compareTo(p2));
+        end check compareTo*/
+        /*check slopeTo
+        Point p1 = new Point(1, 3);
+        Point p2 = new Point(5, 4);
+        StdOut.println(p1.slopeTo(p2));
+        end check slopeTo*/
+        /*check slopeOrder*/
+        int size = StdIn.readInt();
+        Point[] points = new Point[size];
+        int x;
+        int y;
+        int i = 0;
+        while(!StdIn.isEmpty()){
+            x = StdIn.readInt();
+            y = StdIn.readInt();
+            points[i++] = new Point(x,y);
+        }
+        BruteCollinearPoints bruteCollinearPoints = new BruteCollinearPoints(points);
+        StdOut.println(bruteCollinearPoints.numberOfSegments());
+        for (LineSegment p : bruteCollinearPoints.segments()
+        ) {
+            if (p != null) p.draw();
+        }
+        /*end check slopeTo*/
     }
 }
