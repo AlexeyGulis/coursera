@@ -10,6 +10,7 @@ package collinearPoints;
  *
  ******************************************************************************/
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import edu.princeton.cs.algs4.StdDraw;
@@ -111,9 +112,9 @@ public class Point implements Comparable<Point> {
         Comparator<Point> comparator = new Comparator<Point>() {
             @Override
             public int compare(Point p1, Point p2) {
-                if (slopeTo(p1) < slopeTo(p2)) {
+                if (Point.this.slopeTo(p1) < Point.this.slopeTo(p2)) {
                     return -1;
-                } else if (slopeTo(p1) > slopeTo(p2)) {
+                } else if (Point.this.slopeTo(p1) > Point.this.slopeTo(p2)) {
                     return 1;
                 } else {
                     return 0;
@@ -122,7 +123,6 @@ public class Point implements Comparable<Point> {
         };
         return comparator;
     }
-
 
     /**
      * Returns a string representation of this point.
@@ -147,11 +147,11 @@ public class Point implements Comparable<Point> {
         StdOut.println(p1.compareTo(p2));
         end check compareTo*/
         /*check slopeTo
-        Point p1 = new Point(1, 3);
-        Point p2 = new Point(5, 4);
+        Point p1 = new Point(0, 0);
+        Point p2 = new Point(0, 1);
         StdOut.println(p1.slopeTo(p2));
         end check slopeTo*/
-        /*check slopeOrder*/
+        /*check slopeOrder
         int size = StdIn.readInt();
         Point[] points = new Point[size];
         int x;
@@ -162,12 +162,29 @@ public class Point implements Comparable<Point> {
             y = StdIn.readInt();
             points[i++] = new Point(x,y);
         }
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
         BruteCollinearPoints bruteCollinearPoints = new BruteCollinearPoints(points);
         StdOut.println(bruteCollinearPoints.numberOfSegments());
-        for (LineSegment p : bruteCollinearPoints.segments()
-        ) {
-            if (p != null) p.draw();
+        LineSegment[] lineSegments = bruteCollinearPoints.segments();
+        for (int j = 0; j < bruteCollinearPoints.numberOfSegments(); j++) {
+            lineSegments[j].draw();
         }
-        /*end check slopeTo*/
+        StdDraw.show();
+        end check slopeTo*/
+        Point[] points = new Point[9];
+        for (int i = 0; i < 5; i++) {
+            points[i] = new Point(i, 0);
+        }
+        for (int i = 5; i < 8; i++) {
+            points[i] = new Point(3, 4 - i);
+        }
+        points[8] = new Point(5, 6);
+        //Arrays.sort(points);
+        for (int i = 0; i < 9 - 1; i++) {
+            Arrays.sort(points,i + 1, points.length, points[i].slopeOrder());
+        }
+        StdOut.println();
     }
 }
