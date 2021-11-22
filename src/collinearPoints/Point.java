@@ -151,7 +151,7 @@ public class Point implements Comparable<Point> {
         Point p2 = new Point(0, 1);
         StdOut.println(p1.slopeTo(p2));
         end check slopeTo*/
-        /*check slopeOrder
+        /*check slopeOrder*/
         int size = StdIn.readInt();
         Point[] points = new Point[size];
         int x;
@@ -165,14 +165,15 @@ public class Point implements Comparable<Point> {
         StdDraw.enableDoubleBuffering();
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
-        BruteCollinearPoints bruteCollinearPoints = new BruteCollinearPoints(points);
-        StdOut.println(bruteCollinearPoints.numberOfSegments());
-        LineSegment[] lineSegments = bruteCollinearPoints.segments();
-        for (int j = 0; j < bruteCollinearPoints.numberOfSegments(); j++) {
+        FastCollinearPoints fastCollinearPoints = new FastCollinearPoints(points);
+        StdOut.println(fastCollinearPoints.numberOfSegments());
+        LineSegment[] lineSegments = fastCollinearPoints.segments();
+        for (int j = 0; j < fastCollinearPoints.numberOfSegments(); j++) {
             lineSegments[j].draw();
         }
         StdDraw.show();
-        end check slopeTo*/
+        /*end check slopeTo*/
+        /*
         Point[] points = new Point[9];
         for (int i = 0; i < 5; i++) {
             points[i] = new Point(i, 0);
@@ -186,5 +187,6 @@ public class Point implements Comparable<Point> {
             Arrays.sort(points,i + 1, points.length, points[i].slopeOrder());
         }
         StdOut.println();
+         */
     }
 }
