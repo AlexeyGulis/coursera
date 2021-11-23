@@ -1,13 +1,14 @@
 package collinearPoints;
+
 import java.util.Arrays;
 
 public class BruteCollinearPoints {
 
     private final int numberSegments;
     private final LineSegment[] lineSegments;
-    private final Point[] clonePoints;
 
     public BruteCollinearPoints(Point[] points) {
+        Point[] clonePoints;
         int numberSegments1 = 0;
         boolean flag;
         Point[] minMax = new Point[4];

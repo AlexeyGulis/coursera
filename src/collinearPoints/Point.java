@@ -12,8 +12,6 @@ package collinearPoints;
 import java.util.Comparator;
 
 import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
 
 
 public class Point implements Comparable<Point> {
@@ -140,25 +138,5 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         /* YOUR CODE HERE */
-        int size = StdIn.readInt();
-        Point[] points = new Point[size];
-        int x;
-        int y;
-        int i = 0;
-        while(!StdIn.isEmpty()){
-            x = StdIn.readInt();
-            y = StdIn.readInt();
-            points[i++] = new Point(x,y);
-        }
-        StdDraw.enableDoubleBuffering();
-        StdDraw.setXscale(0, 32768);
-        StdDraw.setYscale(0, 32768);
-        FastCollinearPoints fastCollinearPoints = new FastCollinearPoints(points);
-        StdOut.println(fastCollinearPoints.numberOfSegments());
-        LineSegment[] lineSegments = fastCollinearPoints.segments();
-        for (int j = 0; j < fastCollinearPoints.numberOfSegments(); j++) {
-            lineSegments[j].draw();
-        }
-        StdDraw.show();
     }
 }

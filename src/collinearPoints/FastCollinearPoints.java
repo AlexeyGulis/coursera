@@ -8,6 +8,7 @@ public class FastCollinearPoints {
     private final Point[] clonePoints;
     private Point max;
     private Point min;
+    private Point binary;
 
     public FastCollinearPoints(Point[] points) {
         int numberSegments1 = 0;
@@ -29,7 +30,9 @@ public class FastCollinearPoints {
         lineSegments = new LineSegment[clonePoints.length * clonePoints.length];
         for (int i = 0; i < clonePoints.length - 3; i++) {
             Arrays.sort(clonePoints, i + 1, clonePoints.length, clonePoints[i].slopeOrder());
-            if (i != 0) Arrays.sort(clonePoints, 0, i, clonePoints[i].slopeOrder());
+            if (i != 0) {
+                Arrays.sort(clonePoints, 0, i, clonePoints[i].slopeOrder());
+            }
             max = clonePoints[i];
             min = clonePoints[i];
             int k = 0;
@@ -40,7 +43,8 @@ public class FastCollinearPoints {
                     if (j + 1 == clonePoints.length - 1 && k >= 2) {
                         minMax(j + 1);
                         if (i != 0) {
-                            if (this.binarySearch(0, i, min.slopeTo(max)) == -1) {
+                            binary = clonePoints[i];
+                            if (this.binarySearch(0, i - 1, min.slopeTo(max)) == -1) {
                                 lineSegments[numberSegments1++] = new LineSegment(min, max);
                             }
                         } else {
@@ -51,7 +55,8 @@ public class FastCollinearPoints {
                     if (k >= 2) {
                         minMax(j);
                         if (i != 0) {
-                            if (this.binarySearch(0, i, min.slopeTo(max)) == -1) {
+                            binary = clonePoints[i];
+                            if (this.binarySearch(0, i - 1, min.slopeTo(max)) == -1) {
                                 lineSegments[numberSegments1++] = new LineSegment(min, max);
                             }
                         } else {
@@ -78,10 +83,10 @@ public class FastCollinearPoints {
     private int binarySearch(int first, int last, double key) {
         if (last >= first) {
             int mid = first + (last - first) / 2;
-            if (clonePoints[mid].slopeTo(max) == key) {
+            if (clonePoints[mid].slopeTo(binary) == key) {
                 return mid;
             }
-            if (clonePoints[mid].slopeTo(max) > key) {
+            if (clonePoints[mid].slopeTo(binary) > key) {
                 return binarySearch(first, mid - 1, key);
             } else {
                 return binarySearch(mid + 1, last, key);
