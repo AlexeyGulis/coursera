@@ -1,5 +1,4 @@
 package collinearPoints;
-
 /******************************************************************************
  *  Compilation:  javac Point.java
  *  Execution:    java Point
@@ -10,12 +9,12 @@ package collinearPoints;
  *
  ******************************************************************************/
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
+
 
 public class Point implements Comparable<Point> {
 
@@ -69,10 +68,10 @@ public class Point implements Comparable<Point> {
         if (this.x == that.x && this.y == that.y) {
             return Double.NEGATIVE_INFINITY;
         }
-        if (this.x == that.x) {
+        if (this.y == that.y) {
             return +0.0;
         }
-        if (this.y == that.y) {
+        if (this.x == that.x) {
             return Double.POSITIVE_INFINITY;
         }
         return (double) (that.y - this.y) / (double) (that.x - this.x);
@@ -141,17 +140,6 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         /* YOUR CODE HERE */
-        /*check compareTo
-        Point p1 = new Point(1, 2);
-        Point p2 = new Point(1, 2);
-        StdOut.println(p1.compareTo(p2));
-        end check compareTo*/
-        /*check slopeTo
-        Point p1 = new Point(0, 0);
-        Point p2 = new Point(0, 1);
-        StdOut.println(p1.slopeTo(p2));
-        end check slopeTo*/
-        /*check slopeOrder*/
         int size = StdIn.readInt();
         Point[] points = new Point[size];
         int x;
@@ -172,21 +160,5 @@ public class Point implements Comparable<Point> {
             lineSegments[j].draw();
         }
         StdDraw.show();
-        /*end check slopeTo*/
-        /*
-        Point[] points = new Point[9];
-        for (int i = 0; i < 5; i++) {
-            points[i] = new Point(i, 0);
-        }
-        for (int i = 5; i < 8; i++) {
-            points[i] = new Point(3, 4 - i);
-        }
-        points[8] = new Point(5, 6);
-        //Arrays.sort(points);
-        for (int i = 0; i < 9 - 1; i++) {
-            Arrays.sort(points,i + 1, points.length, points[i].slopeOrder());
-        }
-        StdOut.println();
-         */
     }
 }
