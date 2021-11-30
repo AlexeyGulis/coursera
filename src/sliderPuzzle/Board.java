@@ -6,16 +6,18 @@ import edu.princeton.cs.algs4.StdRandom;
 import java.util.Iterator;
 import java.util.Stack;
 
-public class Board {
+public class Board implements Comparable<Board>{
 
     private int[][] tiles;
     private int dimension;
     private int blankSquareI;
     private int blankSquareJ;
-    private Stack<Board> twins;
+    private Stack<Board> neighborsStack;
+    public int cacheDistance;
+    private int moves;
 
     public Board(int[][] tiles) {
-        twins = new Stack<Board>();
+        neighborsStack = new Stack<Board>();
         this.tiles = new int[tiles.length][tiles.length];
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles.length; j++) {
@@ -30,13 +32,21 @@ public class Board {
         dimension = tiles.length;
     }
 
-    private void twinsAddStack(int i, int j) {
+    public int getMoves() {
+        return moves;
+    }
+
+    private void addStack(int i, int j) {
         tiles[blankSquareI][blankSquareJ] = tiles[i][j];
         tiles[i][j] = 0;
         Board newBoard = new Board(tiles);
         tiles[i][j] = tiles[blankSquareI][blankSquareJ];
         tiles[blankSquareI][blankSquareJ] = 0;
-        twins.push(newBoard);
+        newBoard.cacheDistance = cacheDistance;
+        newBoard.cacheDistance -= Math.abs(i - (tiles[i][j] - 1) / dimension()) + Math.abs(j - (tiles[i][j] - 1) % dimension());
+        newBoard.cacheDistance += Math.abs(blankSquareI - (tiles[i][j] - 1) / dimension()) + Math.abs(blankSquareJ - (tiles[i][j] - 1) % dimension());
+        newBoard.moves = this.moves + 1;
+        neighborsStack.push(newBoard);
     }
 
     public String toString() {
@@ -44,7 +54,7 @@ public class Board {
         stringBuilder.append(dimension + "\n");
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                stringBuilder.append(String.format("%2d ",tiles[i][j]));
+                stringBuilder.append(String.format("%2d ", tiles[i][j]));
             }
             stringBuilder.append("\n");
         }
@@ -74,26 +84,31 @@ public class Board {
     }
 
     public int manhattan() {
-        int distance = 0;
-        for (int i = 0; i < dimension(); i++) {
-            for (int j = 0; j < dimension(); j++) {
-                if (i == dimension() - 1 && j == dimension() - 1 && tiles[i][j] != 0) {
-                    distance += tiles[i][j];
-                } else if (twoDimTo1Dim(i, j) + 1 != tiles[i][j]) {
-                    distance += Math.abs(tiles[i][j] - twoDimTo1Dim(i, j) - 1);
+        if(cacheDistance == 0){
+            int distance = 0;
+            int indexI;
+            int indexJ;
+            for (int i = 0; i < dimension(); i++) {
+                for (int j = 0; j < dimension(); j++) {
+                    if (tiles[i][j] != 0) {
+                        indexI = (tiles[i][j] - 1) / dimension();
+                        indexJ = (tiles[i][j] - 1) % dimension();
+                        distance += Math.abs(i - indexI) + Math.abs(j - indexJ);
+                    }
                 }
             }
+            cacheDistance = distance;
         }
-        return distance;
+        return cacheDistance;
     }
 
     public boolean isGoal() {
-        return hamming() == 0;
+        return cacheDistance == 0;
     }
 
     public boolean equals(Object y) {
         if (y == this) return true;
-        if (y != null && y.getClass() != this.getClass()) {
+        if (y != null && y.getClass() == this.getClass()) {
             Board p = (Board) y;
             if (p.dimension() == this.dimension()) {
                 for (int i = 0; i < dimension(); i++) {
@@ -114,16 +129,16 @@ public class Board {
         int i = blankSquareI;
         int j = blankSquareJ;
         if (i != 0) {
-            twinsAddStack(i - 1, j);
+            addStack(i - 1, j);
         }
         if (i != tiles.length - 1) {
-            twinsAddStack(i + 1, j);
+            addStack(i + 1, j);
         }
         if (j != 0) {
-            twinsAddStack(i, j - 1);
+            addStack(i, j - 1);
         }
         if (j != tiles.length - 1) {
-            twinsAddStack(i, j + 1);
+            addStack(i, j + 1);
         }
         Iterable<Board> neighbors = new Iterable<Board>() {
             @Override
@@ -131,12 +146,12 @@ public class Board {
                 return new Iterator<Board>() {
                     @Override
                     public boolean hasNext() {
-                        return !twins.empty();
+                        return !neighborsStack.empty();
                     }
 
                     @Override
                     public Board next() {
-                        return twins.pop();
+                        return neighborsStack.pop();
                     }
                 };
             }
@@ -146,6 +161,15 @@ public class Board {
 
     public Board twin() {
         return null;
+    }
+
+    @Override
+    public int compareTo(Board o) {
+        if(this.getMoves() + this.cacheDistance > o.getMoves() + o.cacheDistance)
+            return 1;
+        else if(this.getMoves() + this.cacheDistance < o.getMoves() + o.cacheDistance){
+            return -1;
+        }else return 0;
     }
 
     public static void main(String[] args) {
@@ -161,6 +185,8 @@ public class Board {
             }
         }
         Board board = new Board(array);
+        Board board1 = new Board(array);
+        StdOut.println(board.equals(board1));
         /*StdRandom.shuffle(shufArray);
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array.length; j++) {
@@ -174,13 +200,9 @@ public class Board {
         StdOut.println(board1.toString());
         StdOut.println(board.equals(board1));
          */
-        StdOut.println(board.toString());
-        for (Board b : board.neighbors()
-        ) {
-            StdOut.println(b);
-        }
 
     }
+
 
 
 }

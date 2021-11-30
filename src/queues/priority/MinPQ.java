@@ -8,7 +8,6 @@ import java.util.Iterator;
 public class MinPQ<Key> implements Iterable<Key> {
     private int size;
     private Key[] a;
-    private Comparator<Key> comparator;
 
     public MinPQ() {
         this(1);
@@ -23,15 +22,6 @@ public class MinPQ<Key> implements Iterable<Key> {
         this(array.length);
         for (Key b : array
              ) {
-            this.insert(b);
-        }
-    }
-
-    public MinPQ(Key[] array, Comparator<Key> comparator) {
-        this(array.length);
-        this.comparator = comparator;
-        for (Key b : array
-        ) {
             this.insert(b);
         }
     }
@@ -58,7 +48,7 @@ public class MinPQ<Key> implements Iterable<Key> {
     }
 
     private boolean greater(int i, int j){
-        return false;
+        return ((Comparable<Key>) a[i]).compareTo(a[j]) > 0;
     }
 
     public Integer deleteMin() {
