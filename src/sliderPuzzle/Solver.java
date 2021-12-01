@@ -2,45 +2,37 @@ package sliderPuzzle;
 
 import edu.princeton.cs.algs4.*;
 
+import sliderPuzzle.Board;
 import java.util.Iterator;
-import java.util.Stack;
 
 public class Solver {
 
     private MinPQ<Board> priorityQueue;
     private MinPQ<Board> gameTree;
-    private Stack<Board> solutionStack;
     private int moves;
 
     public Solver(Board initial) {
         Board topMin = initial;
         topMin.manhattan();
-        solutionStack = new Stack<>();
         moves = 0;
         priorityQueue = new MinPQ<>();
         gameTree = new MinPQ<>();
+        priorityQueue.insert(topMin);
+        topMin.prev = topMin;
+        gameTree.insert(topMin);
+        topMin = priorityQueue.delMin();
+        boolean flag = true;
         while (!topMin.isGoal()) {
-            priorityQueue.insert(topMin);
-            gameTree.insert(topMin);
             for (Board b : topMin.neighbors()
             ) {
-                boolean flag = true;
-                for (Board c : gameTree
-                ) {
-                    if (b.equals(c)) {
-                        flag = false;
-                    }
-                }
-                if (flag) {
-                    priorityQueue.insert(b);
+                if(!topMin.prev.equals(b)) {
                     gameTree.insert(b);
+                    priorityQueue.insert(b);
                 }
             }
-            priorityQueue.delMin();
             topMin = priorityQueue.delMin();
             moves = topMin.getMoves();
         }
-        StdOut.println();
     }
 
     public boolean isSolvable() {
@@ -84,10 +76,6 @@ public class Solver {
         Board initial = new Board(tiles);
         StdOut.println(initial.toString());
         Solver solver = new Solver(initial);
-        for (Board c : solver.solution()
-        ) {
-            StdOut.println(c);
-        }
         StdOut.println(solver.moves());
     }
 }

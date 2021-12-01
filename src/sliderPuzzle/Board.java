@@ -6,7 +6,7 @@ import edu.princeton.cs.algs4.StdRandom;
 import java.util.Iterator;
 import java.util.Stack;
 
-public class Board implements Comparable<Board>{
+public class Board implements Comparable<Board> {
 
     private int[][] tiles;
     private int dimension;
@@ -15,6 +15,7 @@ public class Board implements Comparable<Board>{
     private Stack<Board> neighborsStack;
     public int cacheDistance;
     private int moves;
+    public Board prev;
 
     public Board(int[][] tiles) {
         neighborsStack = new Stack<Board>();
@@ -40,6 +41,7 @@ public class Board implements Comparable<Board>{
         tiles[blankSquareI][blankSquareJ] = tiles[i][j];
         tiles[i][j] = 0;
         Board newBoard = new Board(tiles);
+        newBoard.prev = this;
         tiles[i][j] = tiles[blankSquareI][blankSquareJ];
         tiles[blankSquareI][blankSquareJ] = 0;
         newBoard.cacheDistance = cacheDistance;
@@ -84,7 +86,7 @@ public class Board implements Comparable<Board>{
     }
 
     public int manhattan() {
-        if(cacheDistance == 0){
+        if (cacheDistance == 0) {
             int distance = 0;
             int indexI;
             int indexJ;
@@ -165,11 +167,11 @@ public class Board implements Comparable<Board>{
 
     @Override
     public int compareTo(Board o) {
-        if(this.getMoves() + this.cacheDistance > o.getMoves() + o.cacheDistance)
+        if (this.getMoves() + this.cacheDistance > o.getMoves() + o.cacheDistance)
             return 1;
-        else if(this.getMoves() + this.cacheDistance < o.getMoves() + o.cacheDistance){
+        else if (this.getMoves() + this.cacheDistance < o.getMoves() + o.cacheDistance) {
             return -1;
-        }else return 0;
+        } else return 0;
     }
 
     public static void main(String[] args) {
@@ -202,7 +204,4 @@ public class Board implements Comparable<Board>{
          */
 
     }
-
-
-
 }
