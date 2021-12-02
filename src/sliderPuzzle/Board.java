@@ -1,24 +1,21 @@
 package sliderPuzzle;
 
-import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdRandom;
-
 import java.util.Iterator;
 import java.util.Stack;
 
-public class Board implements Comparable<Board> {
+public class Board{
 
     private int[][] tiles;
     private int dimension;
     private int blankSquareI;
     private int blankSquareJ;
     private Stack<Board> neighborsStack;
-    public int cacheDistance;
+    private int cacheDistance;
     private int moves;
-    public Board prev;
+    private Board prev;
 
     public Board(int[][] tiles) {
-        neighborsStack = new Stack<Board>();
+        neighborsStack = new Stack<>();
         this.tiles = new int[tiles.length][tiles.length];
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles.length; j++) {
@@ -28,9 +25,17 @@ public class Board implements Comparable<Board> {
                     blankSquareJ = j;
                 }
             }
-            System.arraycopy(tiles[i], 0, this.tiles[i], 0, tiles.length);
         }
+        prev = null;
         dimension = tiles.length;
+    }
+
+    public void setPrev(Board prev) {
+        this.prev = prev;
+    }
+
+    public Board getPrev() {
+        return prev;
     }
 
     public int getMoves() {
@@ -48,7 +53,7 @@ public class Board implements Comparable<Board> {
         newBoard.cacheDistance -= Math.abs(i - (tiles[i][j] - 1) / dimension()) + Math.abs(j - (tiles[i][j] - 1) % dimension());
         newBoard.cacheDistance += Math.abs(blankSquareI - (tiles[i][j] - 1) / dimension()) + Math.abs(blankSquareJ - (tiles[i][j] - 1) % dimension());
         newBoard.moves = this.moves + 1;
-        neighborsStack.push(newBoard);
+        if(this.prev == null || !newBoard.equals(this.prev)) neighborsStack.push(newBoard);
     }
 
     public String toString() {
@@ -71,9 +76,7 @@ public class Board implements Comparable<Board> {
         int count = 0;
         for (int i = 0; i < dimension(); i++) {
             for (int j = 0; j < dimension(); j++) {
-                if (i == dimension() - 1 && j == dimension() - 1 && tiles[i][j] != 0) {
-                    count++;
-                } else if (twoDimTo1Dim(i, j) + 1 != tiles[i][j]) {
+                if (tiles[i][j] != 0 && twoDimTo1Dim(i, j) + 1 != tiles[i][j]) {
                     count++;
                 }
             }
@@ -87,19 +90,13 @@ public class Board implements Comparable<Board> {
 
     public int manhattan() {
         if (cacheDistance == 0) {
-            int distance = 0;
-            int indexI;
-            int indexJ;
             for (int i = 0; i < dimension(); i++) {
                 for (int j = 0; j < dimension(); j++) {
                     if (tiles[i][j] != 0) {
-                        indexI = (tiles[i][j] - 1) / dimension();
-                        indexJ = (tiles[i][j] - 1) % dimension();
-                        distance += Math.abs(i - indexI) + Math.abs(j - indexJ);
+                        cacheDistance += Math.abs(i - (tiles[i][j] - 1) / dimension()) + Math.abs(j - (tiles[i][j] - 1) % dimension());
                     }
                 }
             }
-            cacheDistance = distance;
         }
         return cacheDistance;
     }
@@ -162,46 +159,22 @@ public class Board implements Comparable<Board> {
     }
 
     public Board twin() {
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension - 1; j++) {
+                if (tiles[i][j] > 0 && tiles[i][j + 1] > 0) {
+                    int temp = tiles[i][j];
+                    tiles[i][j] = tiles[i][j+1];
+                    tiles[i][j+1] = temp;
+                    Board copy = new Board(tiles);
+                    tiles[i][j+1] = tiles[i][j];
+                    tiles[i][j] = temp;
+                    return copy;
+                }
+            }
+        }
         return null;
     }
 
-    @Override
-    public int compareTo(Board o) {
-        if (this.getMoves() + this.cacheDistance > o.getMoves() + o.cacheDistance)
-            return 1;
-        else if (this.getMoves() + this.cacheDistance < o.getMoves() + o.cacheDistance) {
-            return -1;
-        } else return 0;
-    }
-
     public static void main(String[] args) {
-        int[] shufArray = new int[9];
-        int[][] array = new int[3][3];
-        for (int i = 0; i < shufArray.length; i++) {
-            shufArray[i] = i;
-        }
-        StdRandom.shuffle(shufArray);
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array.length; j++) {
-                array[i][j] = shufArray[i * array.length + j];
-            }
-        }
-        Board board = new Board(array);
-        Board board1 = new Board(array);
-        StdOut.println(board.equals(board1));
-        /*StdRandom.shuffle(shufArray);
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array.length; j++) {
-                array[i][j] = shufArray[i * array.length + j];
-            }
-        }
-        Board board1 = new Board(array);
-        StdOut.println(board.toString());
-        StdOut.println(board.manhattan());
-        StdOut.println(board.hamming());
-        StdOut.println(board1.toString());
-        StdOut.println(board.equals(board1));
-         */
-
     }
 }
