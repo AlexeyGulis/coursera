@@ -1,66 +1,61 @@
 package sliderPuzzle;
 
-import edu.princeton.cs.algs4.*;
-
-import java.util.Comparator;
-import java.util.Iterator;
+import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Solver {
 
-    private MinPQ<Board> priorityQueue;
-    private Stack<Board> solution;
-    private int moves;
-    private Board init;
-    private boolean solve;
+    private final Node goalNode;
+    private final boolean solve;
 
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
-        init = initial;
         Board topMin = initial;
         Board secondTopMin = initial.twin();
-        solution = new Stack<>();
-        topMin.manhattan();
-        secondTopMin.manhattan();
-        moves = 0;
-        priorityQueue = new MinPQ<>(comparator());
-        MinPQ<Board> secondPriorityQueue = new MinPQ<>(comparator());
-        priorityQueue.insert(topMin);
-        topMin = priorityQueue.delMin();
-        secondPriorityQueue.insert(secondTopMin);
-        secondTopMin = secondPriorityQueue.delMin();
-        while (!topMin.isGoal() && !secondTopMin.isGoal()) {
-            for (Board b : topMin.neighbors()
+        MinPQ<Node> priorityQueue = new MinPQ<>();
+        MinPQ<Node> secondPriorityQueue = new MinPQ<>();
+        priorityQueue.insert(new Node(topMin, topMin.manhattan(), 0));
+        secondPriorityQueue.insert(new Node(secondTopMin, secondTopMin.manhattan(), 0));
+        Node first = priorityQueue.delMin();
+        Node second = secondPriorityQueue.delMin();
+        while (!first.that.isGoal() && !second.that.isGoal()) {
+            for (Board b : first.that.neighbors()
             ) {
-                priorityQueue.insert(b);
+                priorityQueue.insert(new Node(b, b.manhattan(), first.moves + 1));
             }
-            for (Board b : secondTopMin.neighbors()
+            for (Board b : second.that.neighbors()
             ) {
-                secondPriorityQueue.insert(b);
+                secondPriorityQueue.insert(new Node(b, b.manhattan(), first.moves + 1));
             }
-            topMin = priorityQueue.delMin();
-            secondTopMin = secondPriorityQueue.delMin();
-            moves = topMin.getMoves();
+            first = priorityQueue.delMin();
+            second = secondPriorityQueue.delMin();
         }
-        solve = topMin.isGoal();
-        while (topMin.getPrev() != null) {
-            solution.push(topMin);
-            topMin = topMin.getPrev();
-        }
-        solution.push(topMin);
+        goalNode = first;
+        solve = first.that.isGoal();
     }
 
-    private Comparator<Board> comparator() {
-        return new Comparator<Board>() {
-            @Override
-            public int compare(Board o1, Board o2) {
-                if (o1.getMoves() + o1.hamming() > o2.getMoves() + o2.hamming())
-                    return 1;
-                else if (o1.getMoves() + o1.hamming() < o2.getMoves() + o2.hamming()) {
-                    return -1;
-                } else return 0;
-            }
-        };
+    private class Node implements Comparable<Node> {
+        public Board that;
+        public int manhattan;
+        public int moves;
+
+        public Node(Board that, int manhattan, int moves) {
+            this.that = that;
+            this.manhattan = manhattan;
+            this.moves = moves;
+        }
+
+        @Override
+        public int compareTo(Node o) {
+            if (manhattan + moves > o.manhattan + o.moves)
+                return 1;
+            else if (manhattan + moves < o.manhattan + o.moves) {
+                return -1;
+            } else return 0;
+        }
     }
+
 
     public boolean isSolvable() {
         return solve;
@@ -68,27 +63,11 @@ public class Solver {
 
     public int moves() {
         if (!isSolvable()) return -1;
-        return moves;
+        return goalNode.moves;
     }
 
     public Iterable<Board> solution() {
-        if (!isSolvable()) return null;
-        return new Iterable<Board>() {
-            @Override
-            public Iterator<Board> iterator() {
-                return new Iterator<Board>() {
-                    @Override
-                    public boolean hasNext() {
-                        return !solution.isEmpty();
-                    }
-
-                    @Override
-                    public Board next() {
-                        return solution.pop();
-                    }
-                };
-            }
-        };
+        return goalNode.that.neighbors();
     }
 
     public static void main(String[] args) {

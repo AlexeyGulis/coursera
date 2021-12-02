@@ -1,9 +1,9 @@
 package sliderPuzzle;
 
 import java.util.Iterator;
-import java.util.Stack;
+import edu.princeton.cs.algs4.Stack;
 
-public class Board{
+public class Board {
 
     private int[][] tiles;
     private int dimension;
@@ -11,7 +11,6 @@ public class Board{
     private int blankSquareJ;
     private Stack<Board> neighborsStack;
     private int cacheDistance;
-    private int moves;
     private Board prev;
 
     public Board(int[][] tiles) {
@@ -30,18 +29,6 @@ public class Board{
         dimension = tiles.length;
     }
 
-    public void setPrev(Board prev) {
-        this.prev = prev;
-    }
-
-    public Board getPrev() {
-        return prev;
-    }
-
-    public int getMoves() {
-        return moves;
-    }
-
     private void addStack(int i, int j) {
         tiles[blankSquareI][blankSquareJ] = tiles[i][j];
         tiles[i][j] = 0;
@@ -52,8 +39,7 @@ public class Board{
         newBoard.cacheDistance = cacheDistance;
         newBoard.cacheDistance -= Math.abs(i - (tiles[i][j] - 1) / dimension()) + Math.abs(j - (tiles[i][j] - 1) % dimension());
         newBoard.cacheDistance += Math.abs(blankSquareI - (tiles[i][j] - 1) / dimension()) + Math.abs(blankSquareJ - (tiles[i][j] - 1) % dimension());
-        newBoard.moves = this.moves + 1;
-        if(this.prev == null || !newBoard.equals(this.prev)) neighborsStack.push(newBoard);
+        if (this.prev == null || !newBoard.equals(this.prev)) neighborsStack.push(newBoard);
     }
 
     public String toString() {
@@ -101,6 +87,7 @@ public class Board{
         return cacheDistance;
     }
 
+
     public boolean isGoal() {
         return cacheDistance == 0;
     }
@@ -127,25 +114,35 @@ public class Board{
     public Iterable<Board> neighbors() {
         int i = blankSquareI;
         int j = blankSquareJ;
-        if (i != 0) {
-            addStack(i - 1, j);
+        if (this.isGoal()) {
+            Board that = this.prev;
+            neighborsStack.push(this);
+            while (that != null) {
+                neighborsStack.push(that);
+                that = that.prev;
+            }
+        } else {
+            if (i != 0) {
+                addStack(i - 1, j);
+            }
+            if (i != tiles.length - 1) {
+                addStack(i + 1, j);
+            }
+            if (j != 0) {
+                addStack(i, j - 1);
+            }
+            if (j != tiles.length - 1) {
+                addStack(i, j + 1);
+            }
         }
-        if (i != tiles.length - 1) {
-            addStack(i + 1, j);
-        }
-        if (j != 0) {
-            addStack(i, j - 1);
-        }
-        if (j != tiles.length - 1) {
-            addStack(i, j + 1);
-        }
+
         Iterable<Board> neighbors = new Iterable<Board>() {
             @Override
             public Iterator<Board> iterator() {
                 return new Iterator<Board>() {
                     @Override
                     public boolean hasNext() {
-                        return !neighborsStack.empty();
+                        return !neighborsStack.isEmpty();
                     }
 
                     @Override
@@ -163,10 +160,10 @@ public class Board{
             for (int j = 0; j < dimension - 1; j++) {
                 if (tiles[i][j] > 0 && tiles[i][j + 1] > 0) {
                     int temp = tiles[i][j];
-                    tiles[i][j] = tiles[i][j+1];
-                    tiles[i][j+1] = temp;
+                    tiles[i][j] = tiles[i][j + 1];
+                    tiles[i][j + 1] = temp;
                     Board copy = new Board(tiles);
-                    tiles[i][j+1] = tiles[i][j];
+                    tiles[i][j + 1] = tiles[i][j];
                     tiles[i][j] = temp;
                     return copy;
                 }
