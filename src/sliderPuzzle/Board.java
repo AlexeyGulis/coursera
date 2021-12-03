@@ -1,20 +1,23 @@
 package sliderPuzzle;
 
+
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Board {
 
     private int[][] tiles;
-    private int dimension;
+    private final int dimension;
     private int blankSquareI;
     private int blankSquareJ;
-    private Stack<Board> neighborsStack;
     private int cacheDistance;
-    private Board prev;
 
     public Board(int[][] tiles) {
-        neighborsStack = new Stack<>();
+        dimension = tiles.length;
         this.tiles = new int[tiles.length][tiles.length];
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles.length; j++) {
@@ -25,21 +28,19 @@ public class Board {
                 }
             }
         }
-        prev = null;
-        dimension = tiles.length;
+        cacheDistance = manhattan();
     }
 
-    private void addStack(int i, int j) {
+    private void addStack(int i, int j, Stack<Board> neighborsStack) {
         tiles[blankSquareI][blankSquareJ] = tiles[i][j];
         tiles[i][j] = 0;
         Board newBoard = new Board(tiles);
-        newBoard.prev = this;
         tiles[i][j] = tiles[blankSquareI][blankSquareJ];
         tiles[blankSquareI][blankSquareJ] = 0;
         newBoard.cacheDistance = cacheDistance;
         newBoard.cacheDistance -= Math.abs(i - (tiles[i][j] - 1) / dimension()) + Math.abs(j - (tiles[i][j] - 1) % dimension());
         newBoard.cacheDistance += Math.abs(blankSquareI - (tiles[i][j] - 1) / dimension()) + Math.abs(blankSquareJ - (tiles[i][j] - 1) % dimension());
-        if (this.prev == null || !newBoard.equals(this.prev)) neighborsStack.push(newBoard);
+        neighborsStack.push(newBoard);
     }
 
     public String toString() {
@@ -99,11 +100,13 @@ public class Board {
             if (p.dimension() == this.dimension()) {
                 for (int i = 0; i < dimension(); i++) {
                     for (int j = 0; j < dimension(); j++) {
-                        if (p.tiles[i][j] != tiles[i][j]) {
+                        if (p.tiles[i][j] != this.tiles[i][j]) {
                             return false;
                         }
                     }
                 }
+            } else {
+                return false;
             }
         } else {
             return false;
@@ -114,28 +117,19 @@ public class Board {
     public Iterable<Board> neighbors() {
         int i = blankSquareI;
         int j = blankSquareJ;
-        if (this.isGoal()) {
-            Board that = this.prev;
-            neighborsStack.push(this);
-            while (that != null) {
-                neighborsStack.push(that);
-                that = that.prev;
-            }
-        } else {
-            if (i != 0) {
-                addStack(i - 1, j);
-            }
-            if (i != tiles.length - 1) {
-                addStack(i + 1, j);
-            }
-            if (j != 0) {
-                addStack(i, j - 1);
-            }
-            if (j != tiles.length - 1) {
-                addStack(i, j + 1);
-            }
+        Stack<Board> neighborsStack = new Stack<>();
+        if (i != 0) {
+            addStack(i - 1, j, neighborsStack);
         }
-
+        if (i != tiles.length - 1) {
+            addStack(i + 1, j, neighborsStack);
+        }
+        if (j != 0) {
+            addStack(i, j - 1, neighborsStack);
+        }
+        if (j != tiles.length - 1) {
+            addStack(i, j + 1, neighborsStack);
+        }
         Iterable<Board> neighbors = new Iterable<Board>() {
             @Override
             public Iterator<Board> iterator() {
@@ -147,6 +141,7 @@ public class Board {
 
                     @Override
                     public Board next() {
+                        if (!hasNext()) throw new NoSuchElementException();
                         return neighborsStack.pop();
                     }
                 };
@@ -173,5 +168,13 @@ public class Board {
     }
 
     public static void main(String[] args) {
+        int n = StdIn.readInt();
+        int[][] tiles = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                tiles[i][j] = StdIn.readInt();
+        Board initial = new Board(tiles);
+        StdOut.println(initial.toString());
+        StdOut.println(initial.isGoal());
     }
 }

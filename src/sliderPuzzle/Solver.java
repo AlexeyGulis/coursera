@@ -1,6 +1,7 @@
 package sliderPuzzle;
 
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -15,18 +16,22 @@ public class Solver {
         Board secondTopMin = initial.twin();
         MinPQ<Node> priorityQueue = new MinPQ<>();
         MinPQ<Node> secondPriorityQueue = new MinPQ<>();
-        priorityQueue.insert(new Node(topMin, topMin.manhattan(), 0));
-        secondPriorityQueue.insert(new Node(secondTopMin, secondTopMin.manhattan(), 0));
+        priorityQueue.insert(new Node(topMin, topMin.manhattan(), 0, null));
+        secondPriorityQueue.insert(new Node(secondTopMin, secondTopMin.manhattan(), 0, null));
         Node first = priorityQueue.delMin();
         Node second = secondPriorityQueue.delMin();
         while (!first.that.isGoal() && !second.that.isGoal()) {
             for (Board b : first.that.neighbors()
             ) {
-                priorityQueue.insert(new Node(b, b.manhattan(), first.moves + 1));
+                if (first.prev == null || !first.prev.that.equals(b)) {
+                    priorityQueue.insert(new Node(b, b.manhattan(), first.moves + 1, first));
+                }
             }
             for (Board b : second.that.neighbors()
             ) {
-                secondPriorityQueue.insert(new Node(b, b.manhattan(), first.moves + 1));
+                if (second.prev == null || !second.prev.that.equals(b)) {
+                    secondPriorityQueue.insert(new Node(b, b.manhattan(), first.moves + 1, second));
+                }
             }
             first = priorityQueue.delMin();
             second = secondPriorityQueue.delMin();
@@ -39,18 +44,20 @@ public class Solver {
         public Board that;
         public int manhattan;
         public int moves;
+        public Node prev;
 
-        public Node(Board that, int manhattan, int moves) {
+        public Node(Board that, int manhattan, int moves, Node prev) {
             this.that = that;
             this.manhattan = manhattan;
             this.moves = moves;
+            this.prev = prev;
         }
 
         @Override
-        public int compareTo(Node o) {
-            if (manhattan + moves > o.manhattan + o.moves)
+        public int compareTo(Node n) {
+            if (manhattan + moves > n.manhattan + n.moves)
                 return 1;
-            else if (manhattan + moves < o.manhattan + o.moves) {
+            else if (manhattan + moves < n.manhattan + n.moves) {
                 return -1;
             } else return 0;
         }
@@ -67,7 +74,15 @@ public class Solver {
     }
 
     public Iterable<Board> solution() {
-        return goalNode.that.neighbors();
+        if (!isSolvable()) return null;
+        Stack<Board> solution = new Stack<>();
+        Node sol = goalNode;
+        while (sol.prev != null) {
+            solution.push(sol.that);
+            sol = sol.prev;
+        }
+        solution.push(sol.that);
+        return solution;
     }
 
     public static void main(String[] args) {
@@ -86,8 +101,9 @@ public class Solver {
             StdOut.println("No solution possible");
         else {
             StdOut.println("Minimum number of moves = " + solver.moves());
-            for (Board board : solver.solution())
+            for (Board board : solver.solution()){
                 StdOut.println(board);
+            }
         }
     }
 }
