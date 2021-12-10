@@ -159,11 +159,15 @@ public class KdTree {
 
     public Point2D nearest(Point2D p) {
         if (p == null || topNode == null) throw new IllegalArgumentException();
-        Point2D nearest = topNode.key;
         return nearest(topNode, p, topNode.key);
     }
 
     private Point2D nearest(Node n, Point2D p, Point2D search) {
+        if(n.left == null && n.right == null){
+            return search;
+        }else{
+
+        }
         return null;
     }
 
