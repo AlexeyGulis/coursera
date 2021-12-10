@@ -18,11 +18,12 @@ public class KdTree {
         public int size;
         public Point2D key;
 
-        public Node(Node left, Node right, int size, Point2D key) {
+        public Node(Node left, Node right, int size, Point2D key, RectHV rectHV) {
             this.left = left;
             this.right = right;
             this.size = size;
             this.key = key;
+            this.rectHV = rectHV;
         }
     }
 
@@ -40,11 +41,11 @@ public class KdTree {
 
     public void insert(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
-        topNode = insert(topNode, p, true);
+        topNode = insert(topNode, p, true, new RectHV(0, 0, 1, 1));
     }
 
-    private Node insert(Node search, Point2D newPoint, boolean rotate) {
-        if (search == null) return new Node(null, null, 1, newPoint);
+    private Node insert(Node search, Point2D newPoint, boolean rotate, RectHV rect) {
+        if (search == null) return new Node(null, null, 1, newPoint, rect);
         int cmp;
         int cmpAlt;
         if (rotate) {
@@ -55,10 +56,19 @@ public class KdTree {
             cmpAlt = comparePoint(search.key.x(), newPoint.x());
         }
         if (cmp > 0) {
-            search.left = insert(search.left, newPoint, !rotate);
+            if (rotate) {
+                search.left = insert(search.left, newPoint, !rotate, new RectHV(rect.xmin(), rect.ymin(), search.key.x(), rect.ymax()));
+            } else {
+                search.left = insert(search.left, newPoint, !rotate, new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), search.key.y()));
+            }
         } else if (cmp <= 0) {
             if (cmpAlt != 0) {
-                search.right = insert(search.right, newPoint, !rotate);
+                if (rotate) {
+                    search.right = insert(search.right, newPoint, !rotate, new RectHV(search.key.x(), rect.ymin(), rect.xmax(), rect.ymax()));
+                } else {
+                    search.right = insert(search.right, newPoint, !rotate, new RectHV(rect.xmin(), search.key.y(), rect.xmax(), rect.ymax()));
+                }
+
             }
         }
         search.size = 1 + size(search.left) + size(search.right);
