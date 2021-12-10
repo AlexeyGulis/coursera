@@ -2,6 +2,7 @@ package kdTree;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.TreeSet;
@@ -11,6 +12,7 @@ public class KdTree {
     private Node topNode;
 
     private class Node {
+        public RectHV rectHV;
         public Node left;
         public Node right;
         public int size;
@@ -105,6 +107,38 @@ public class KdTree {
 
 
     public void draw() {
+        if (topNode == null) {
+            return;
+        }
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        topNode.key.draw();
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenRadius();
+        StdDraw.line(topNode.key.x(), 0, topNode.key.x(), 1);
+        draw(topNode.left, 0, topNode.key.x(), 0, 1, false);
+        draw(topNode.right, topNode.key.x(), 1, 0, 1, false);
+    }
+
+    private void draw(Node n, double xmin, double xmax, double ymin, double ymax, boolean t) {
+        if (n == null) return;
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        n.key.draw();
+        if (t) {
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.setPenRadius();
+            StdDraw.line(n.key.x(), ymin, n.key.x(), ymax);
+            draw(n.left, xmin, n.key.x(), ymin, ymax, !t);
+            draw(n.right, n.key.x(), xmax, ymin, ymax, !t);
+        } else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.setPenRadius();
+            StdDraw.line(xmin, n.key.y(), xmax, n.key.y());
+            draw(n.left, xmin, xmax, ymin, n.key.y(), !t);
+            draw(n.right, xmin, xmax, n.key.y(), ymax, !t);
+        }
+
     }
 
     public Iterable<Point2D> range(RectHV rect) {
@@ -120,82 +154,19 @@ public class KdTree {
     }
 
     private Point2D nearest(Node n, Point2D p, Point2D search) {
-
-        if (n.left == null) {
-            if (n.right == null) {
-                return search;
-            } else {
-                Double temp2 = n.right.key.distanceSquaredTo(p);
-                Double temp3 = search.distanceSquaredTo(p);
-                if (temp2 < temp3) {
-                    search = n.right.key;
-                    search = nearest(n.right, p, search);
-                } else if (temp2 > temp3) {
-                    search = nearest(n.right, p, search);
-                } else {
-                    return n.right.key;
-                }
-            }
-        } else {
-            Double temp1 = n.left.key.distanceSquaredTo(p);
-            Double temp3 = search.distanceSquaredTo(p);
-            if (temp1 < temp3) {
-                if (n.right != null) {
-                    Double temp2 = n.right.key.distanceSquaredTo(p);
-                    if (temp2 < temp1) {
-                        search = n.right.key;
-                        search = nearest(n.right, p, search);
-                    } else if (temp2 > temp1) {
-                        search = n.left.key;
-                        search = nearest(n.left, p, search);
-                    } else {
-                        Point2D d1 = nearest(n.left, p, search);
-                        Point2D d2 = nearest(n.right, p, search);
-                        if (d1.distanceSquaredTo(p) > d2.distanceSquaredTo(p)) {
-                            search = d2;
-                        } else {
-                            search = d1;
-                        }
-                    }
-                } else {
-                    search = n.right.key;
-                    search = nearest(n.left, p, search);
-                }
-            } else if (n.right != null) {
-                Double temp2 = n.right.key.distanceSquaredTo(p);
-                if (temp2 < temp3) {
-                    search = n.right.key;
-                    search = nearest(n.right, p, search);
-                } else if (temp1 > temp3 && temp2 > temp3) {
-                    Point2D d1 = nearest(n.left, p, search);
-                    Point2D d2 = nearest(n.right, p, search);
-                    if (d1.distanceSquaredTo(p) > d2.distanceSquaredTo(p)) {
-                        search = d2;
-                    } else {
-                        search = d1;
-                    }
-                } else {
-                    if (temp1 == temp3) {
-                        return n.left.key;
-                    } else return n.right.key;
-                }
-            } else {
-                if (temp1 > temp3) {
-                    search = nearest(n.left, p, search);
-                } else return n.left.key;
-            }
-        }
-        return search;
+        return null;
     }
 
     public static void main(String[] args) {
         KdTree kdTree = new KdTree();
         kdTree.insert(new Point2D(0.7, 0.2));
-        kdTree.insert(new Point2D(0.7, 0.3));
+        kdTree.insert(new Point2D(0.7, 0.5));
         kdTree.insert(new Point2D(0.5, 0.4));
         kdTree.insert(new Point2D(0.2, 0.3));
         kdTree.insert(new Point2D(0.4, 0.7));
         kdTree.insert(new Point2D(0.9, 0.6));
-        kdTree.nearest(new Point2D(0.9, 0.9));
+        StdDraw.clear();
+        kdTree.draw();
+        StdDraw.show();
     }
 }
