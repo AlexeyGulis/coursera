@@ -1,9 +1,6 @@
 package kdTree;
 
-import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.*;
 
 import java.util.Stack;
 
@@ -61,14 +58,17 @@ public class KdTree {
             } else {
                 search.left = insert(search.left, newPoint, !rotate, new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), search.key.y()));
             }
-        } else if (cmp <= 0) {
-            if (cmpAlt != 0) {
-                if (rotate) {
-                    search.right = insert(search.right, newPoint, !rotate, new RectHV(search.key.x(), rect.ymin(), rect.xmax(), rect.ymax()));
-                } else {
-                    search.right = insert(search.right, newPoint, !rotate, new RectHV(rect.xmin(), search.key.y(), rect.xmax(), rect.ymax()));
-                }
-
+        } else if (cmp < 0) {
+            if (rotate) {
+                search.right = insert(search.right, newPoint, !rotate, new RectHV(search.key.x(), rect.ymin(), rect.xmax(), rect.ymax()));
+            } else {
+                search.right = insert(search.right, newPoint, !rotate, new RectHV(rect.xmin(), search.key.y(), rect.xmax(), rect.ymax()));
+            }
+        } else if (cmp == 0 && cmpAlt != 0) {
+            if (rotate) {
+                search.right = insert(search.right, newPoint, !rotate, new RectHV(search.key.x(), rect.ymin(), rect.xmax(), rect.ymax()));
+            } else {
+                search.right = insert(search.right, newPoint, !rotate, new RectHV(rect.xmin(), search.key.y(), rect.xmax(), rect.ymax()));
             }
         }
         search.size = 1 + size(search.left) + size(search.right);
@@ -154,17 +154,18 @@ public class KdTree {
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new IllegalArgumentException();
         Stack<Point2D> stack = new Stack<>();
-        addStack(topNode,rect,stack);
+        addStack(topNode, rect, stack);
         return stack;
     }
-    private void addStack(Node n,RectHV rect,Stack<Point2D> stack){
-        if(n != null){
-            if(n.rectHV.intersects(rect)){
-                if(rect.contains(n.key)){
+
+    private void addStack(Node n, RectHV rect, Stack<Point2D> stack) {
+        if (n != null) {
+            if (n.rectHV.intersects(rect)) {
+                if (rect.contains(n.key)) {
                     stack.add(n.key);
                 }
-                addStack(n.left,rect,stack);
-                addStack(n.right,rect,stack);
+                addStack(n.left, rect, stack);
+                addStack(n.right, rect, stack);
             }
         }
     }
@@ -184,6 +185,7 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
+        /*
         KdTree kdTree = new KdTree();
         kdTree.insert(new Point2D(0.7, 0.2));
         kdTree.insert(new Point2D(0.7, 0.5));
@@ -200,5 +202,17 @@ public class KdTree {
         }
         StdDraw.show();
 
+         */
+        String filename = args[0];
+        In in = new In(filename);
+        KdTree kdtree = new KdTree();
+        while (!in.isEmpty()) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            Point2D p = new Point2D(x, y);
+            kdtree.insert(p);
+        }
+        kdtree.draw();
+        StdDraw.show();
     }
 }
