@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.TreeSet;
+import java.util.Stack;
 
 public class KdTree {
 
@@ -125,12 +125,12 @@ public class KdTree {
         topNode.key.draw();
         StdDraw.setPenColor(StdDraw.RED);
         StdDraw.setPenRadius();
-        StdDraw.line(topNode.key.x(), 0, topNode.key.x(), 1);
-        draw(topNode.left, 0, topNode.key.x(), 0, 1, false);
-        draw(topNode.right, topNode.key.x(), 1, 0, 1, false);
+        StdDraw.line(topNode.key.x(), topNode.rectHV.ymin(), topNode.key.x(), topNode.rectHV.ymax());
+        draw(topNode.left, false);
+        draw(topNode.right, false);
     }
 
-    private void draw(Node n, double xmin, double xmax, double ymin, double ymax, boolean t) {
+    private void draw(Node n, boolean t) {
         if (n == null) return;
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.01);
@@ -138,23 +138,35 @@ public class KdTree {
         if (t) {
             StdDraw.setPenColor(StdDraw.RED);
             StdDraw.setPenRadius();
-            StdDraw.line(n.key.x(), ymin, n.key.x(), ymax);
-            draw(n.left, xmin, n.key.x(), ymin, ymax, !t);
-            draw(n.right, n.key.x(), xmax, ymin, ymax, !t);
+            StdDraw.line(n.key.x(), n.rectHV.ymin(), n.key.x(), n.rectHV.ymax());
+            draw(n.left, !t);
+            draw(n.right, !t);
         } else {
             StdDraw.setPenColor(StdDraw.BLUE);
             StdDraw.setPenRadius();
-            StdDraw.line(xmin, n.key.y(), xmax, n.key.y());
-            draw(n.left, xmin, xmax, ymin, n.key.y(), !t);
-            draw(n.right, xmin, xmax, n.key.y(), ymax, !t);
+            StdDraw.line(n.rectHV.xmin(), n.key.y(), n.rectHV.xmax(), n.key.y());
+            draw(n.left, !t);
+            draw(n.right, !t);
         }
 
     }
 
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new IllegalArgumentException();
-        TreeSet<Point2D> rangeSet = new TreeSet<>();
-        return rangeSet;
+        Stack<Point2D> stack = new Stack<>();
+        addStack(topNode,rect,stack);
+        return stack;
+    }
+    private void addStack(Node n,RectHV rect,Stack<Point2D> stack){
+        if(n != null){
+            if(n.rectHV.intersects(rect)){
+                if(rect.contains(n.key)){
+                    stack.add(n.key);
+                }
+                addStack(n.left,rect,stack);
+                addStack(n.right,rect,stack);
+            }
+        }
     }
 
     public Point2D nearest(Point2D p) {
@@ -163,9 +175,9 @@ public class KdTree {
     }
 
     private Point2D nearest(Node n, Point2D p, Point2D search) {
-        if(n.left == null && n.right == null){
+        if (n.left == null && n.right == null) {
             return search;
-        }else{
+        } else {
 
         }
         return null;
@@ -179,8 +191,14 @@ public class KdTree {
         kdTree.insert(new Point2D(0.2, 0.3));
         kdTree.insert(new Point2D(0.4, 0.7));
         kdTree.insert(new Point2D(0.9, 0.6));
-        StdDraw.clear();
-        kdTree.draw();
+        RectHV rectHV = new RectHV(0.0,0.0,0.6,1.0);
+        for (Point2D p: kdTree.range(rectHV)
+             ) {
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.setPenRadius(0.01);
+            p.draw();
+        }
         StdDraw.show();
+
     }
 }
