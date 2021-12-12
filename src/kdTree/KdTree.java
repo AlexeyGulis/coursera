@@ -1,14 +1,16 @@
 package kdTree;
 
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.StdDraw;
 
-import java.util.Stack;
 
 public class KdTree {
 
     private Node topNode;
 
-    private class Node {
+    private static class Node {
         public RectHV rectHV;
         public Node left;
         public Node right;
@@ -33,7 +35,7 @@ public class KdTree {
     }
 
     public int size() {
-        return topNode.size;
+        return isEmpty() ? 0 : topNode.size;
     }
 
     public void insert(Point2D p) {
@@ -162,7 +164,7 @@ public class KdTree {
         if (n != null) {
             if (n.rectHV.intersects(rect)) {
                 if (rect.contains(n.key)) {
-                    stack.add(n.key);
+                    stack.push(n.key);
                 }
                 addStack(n.left, rect, stack);
                 addStack(n.right, rect, stack);
@@ -195,39 +197,5 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
-        /*
-        KdTree kdTree = new KdTree();
-        kdTree.insert(new Point2D(0.7, 0.2));
-        kdTree.insert(new Point2D(0.7, 0.5));
-        kdTree.insert(new Point2D(0.5, 0.4));
-        kdTree.insert(new Point2D(0.2, 0.3));
-        kdTree.insert(new Point2D(0.4, 0.7));
-        kdTree.insert(new Point2D(0.9, 0.6));
-        RectHV rectHV = new RectHV(0.0,0.0,0.6,1.0);
-        for (Point2D p: kdTree.range(rectHV)
-             ) {
-            StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.setPenRadius(0.01);
-            p.draw();
-        }
-        StdDraw.show();
-
-         */
-        String filename = args[0];
-        In in = new In(filename);
-        KdTree kdtree = new KdTree();
-        while (!in.isEmpty()) {
-            double x = in.readDouble();
-            double y = in.readDouble();
-            Point2D p = new Point2D(x, y);
-            kdtree.insert(p);
-        }
-        kdtree.draw();
-        Point2D nearest = new Point2D(0.1, 0.1);
-        StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.01);
-        nearest.draw();
-        StdOut.println(kdtree.nearest(nearest));
-        StdDraw.show();
     }
 }

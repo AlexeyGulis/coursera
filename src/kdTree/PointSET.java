@@ -2,14 +2,12 @@ package kdTree;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdOut;
 
 import java.util.TreeSet;
 
 public class PointSET {
 
-    private TreeSet<Point2D> point2DSet;
+    private final TreeSet<Point2D> point2DSet;
 
     public PointSET() {
         point2DSet = new TreeSet<>();
@@ -65,15 +63,5 @@ public class PointSET {
     }
 
     public static void main(String[] args) {
-        PointSET set = new PointSET();
-        set.insert(new Point2D(0.7, 0.2));
-        set.insert(new Point2D(0.5, 0.4));
-        set.insert(new Point2D(0.2, 0.3));
-        set.insert(new Point2D(0.4, 0.7));
-        set.insert(new Point2D(0.9, 0.6));
-        for (Point2D d : set.range(new RectHV(0.3, 0.3, 1.0, 1.0))
-        ) {
-            StdOut.println(d);
-        }
     }
 }
