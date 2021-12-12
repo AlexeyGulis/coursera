@@ -181,68 +181,17 @@ public class KdTree {
         if (n == null) return search;
         if (n.rectHV.distanceSquaredTo(p) < search.distanceSquaredTo(p)) {
             if (n.key.distanceSquaredTo(p) < search.distanceSquaredTo(p)) {
-                if (n.left == null || n.right == null) {
-                    if (n.left == null) {
-                        search = nearest(n.right, p, n.key);
-                    } else {
-                        search = nearest(n.left, p, n.key);
-                    }
-                } else {
-                    Point2D search1;
-                    Point2D search2;
-                    if (n.left.rectHV.contains(p)) {
-                        search1 = nearest(n.left, p, n.key);
-                        if (search1.distanceSquaredTo(p) >= n.right.rectHV.distanceSquaredTo(p)) {
-                            search2 = nearest(n.right, p, n.key);
-                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
-                        } else {
-                            search = search1;
-                        }
-                    } else if (n.right.rectHV.contains(p)) {
-                        search1 = nearest(n.right, p, n.key);
-                        if (search1.distanceSquaredTo(p) >= n.left.rectHV.distanceSquaredTo(p)) {
-                            search2 = nearest(n.right, p, n.key);
-                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
-                        } else {
-                            search = search1;
-                        }
-                    }
-                }
+                Point2D search1 = nearest(n.left, p, n.key);
+                Point2D search2 = nearest(n.right, p, n.key);
+                search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
+
             } else {
-                if (n.left == null || n.right == null) {
-                    if (n.left == null) {
-                        search = nearest(n.right, p, search);
-                    } else {
-                        search = nearest(n.left, p, search);
-                    }
-                } else {
-                    Point2D search1;
-                    Point2D search2;
-                    if (n.left.rectHV.contains(p)) {
-                        search1 = nearest(n.left, p, search);
-                        if (search1.distanceSquaredTo(p) >= n.right.rectHV.distanceSquaredTo(p)) {
-                            search2 = nearest(n.right, p, search);
-                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
-                        } else {
-                            search = search1;
-                        }
-                    } else if (n.right.rectHV.contains(p)) {
-                        search1 = nearest(n.right, p, search);
-                        if (search1.distanceSquaredTo(p) >= n.left.rectHV.distanceSquaredTo(p)) {
-                            search2 = nearest(n.right, p, search);
-                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
-                        } else {
-                            search = search1;
-                        }
-                    }
-                }
+                Point2D search1 = nearest(n.left, p, search);
+                Point2D search2 = nearest(n.right, p, search);
+                search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
             }
         }
         return search;
-    }
-
-    private void searchTwoSubTrees() {
-
     }
 
     public static void main(String[] args) {
