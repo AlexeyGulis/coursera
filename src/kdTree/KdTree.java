@@ -172,16 +172,77 @@ public class KdTree {
 
     public Point2D nearest(Point2D p) {
         if (p == null || topNode == null) throw new IllegalArgumentException();
-        return nearest(topNode, p, topNode.key);
+        Point2D result1 = nearest(topNode.left, p, topNode.key);
+        Point2D result2 = nearest(topNode.right, p, topNode.key);
+        return result1.distanceSquaredTo(p) < result2.distanceSquaredTo(p) ? result1 : result2;
     }
 
     private Point2D nearest(Node n, Point2D p, Point2D search) {
-        if (n.left == null && n.right == null) {
-            return search;
-        } else {
-
+        if (n == null) return search;
+        if (n.rectHV.distanceSquaredTo(p) < search.distanceSquaredTo(p)) {
+            if (n.key.distanceSquaredTo(p) < search.distanceSquaredTo(p)) {
+                if (n.left == null || n.right == null) {
+                    if (n.left == null) {
+                        search = nearest(n.right, p, n.key);
+                    } else {
+                        search = nearest(n.left, p, n.key);
+                    }
+                } else {
+                    Point2D search1;
+                    Point2D search2;
+                    if (n.left.rectHV.contains(p)) {
+                        search1 = nearest(n.left, p, n.key);
+                        if (search1.distanceSquaredTo(p) >= n.right.rectHV.distanceSquaredTo(p)) {
+                            search2 = nearest(n.right, p, n.key);
+                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
+                        } else {
+                            search = search1;
+                        }
+                    } else if (n.right.rectHV.contains(p)) {
+                        search1 = nearest(n.right, p, n.key);
+                        if (search1.distanceSquaredTo(p) >= n.left.rectHV.distanceSquaredTo(p)) {
+                            search2 = nearest(n.right, p, n.key);
+                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
+                        } else {
+                            search = search1;
+                        }
+                    }
+                }
+            } else {
+                if (n.left == null || n.right == null) {
+                    if (n.left == null) {
+                        search = nearest(n.right, p, search);
+                    } else {
+                        search = nearest(n.left, p, search);
+                    }
+                } else {
+                    Point2D search1;
+                    Point2D search2;
+                    if (n.left.rectHV.contains(p)) {
+                        search1 = nearest(n.left, p, search);
+                        if (search1.distanceSquaredTo(p) >= n.right.rectHV.distanceSquaredTo(p)) {
+                            search2 = nearest(n.right, p, search);
+                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
+                        } else {
+                            search = search1;
+                        }
+                    } else if (n.right.rectHV.contains(p)) {
+                        search1 = nearest(n.right, p, search);
+                        if (search1.distanceSquaredTo(p) >= n.left.rectHV.distanceSquaredTo(p)) {
+                            search2 = nearest(n.right, p, search);
+                            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
+                        } else {
+                            search = search1;
+                        }
+                    }
+                }
+            }
         }
-        return null;
+        return search;
+    }
+
+    private void searchTwoSubTrees() {
+
     }
 
     public static void main(String[] args) {
@@ -213,6 +274,11 @@ public class KdTree {
             kdtree.insert(p);
         }
         kdtree.draw();
+        Point2D nearest = new Point2D(0.1, 0.1);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(0.01);
+        nearest.draw();
+        StdOut.println(kdtree.nearest(nearest));
         StdDraw.show();
     }
 }
