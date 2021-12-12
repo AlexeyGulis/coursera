@@ -57,7 +57,7 @@ public class PointSET {
         ) {
             if (nearest == null) {
                 nearest = c;
-            } else if (c.distanceTo(p) < nearest.distanceSquaredTo(p)) {
+            } else if (c.distanceSquaredTo(p) < nearest.distanceSquaredTo(p)) {
                 nearest = c;
             }
         }
