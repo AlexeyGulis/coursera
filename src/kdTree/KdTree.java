@@ -1,3 +1,4 @@
+package kdTree;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
@@ -160,24 +161,23 @@ public class KdTree {
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
         if(topNode == null) return null;
-        Point2D result1 = nearest(topNode.left, p, topNode.key);
-        Point2D result2 = nearest(topNode.right, p, topNode.key);
-        return result1.distanceSquaredTo(p) < result2.distanceSquaredTo(p) ? result1 : result2;
+        return nearest(topNode, p, topNode.key);
     }
 
     private Point2D nearest(Node n, Point2D p, Point2D search) {
         if (n == null) return search;
-        if (n.rectHV.distanceSquaredTo(p) < search.distanceSquaredTo(p)) {
-            if (n.key.distanceSquaredTo(p) < search.distanceSquaredTo(p)) {
-                Point2D search1 = nearest(n.left, p, n.key);
-                Point2D search2 = nearest(n.right, p, n.key);
-                search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
-
+        double searchDistance = search.distanceSquaredTo(p);
+        if (n.rectHV.distanceSquaredTo(p) < searchDistance) {
+            Point2D search1;
+            Point2D search2;
+            if (n.key.distanceSquaredTo(p) < searchDistance) {
+                search1 = nearest(n.left, p, n.key);
+                search2 = nearest(n.right, p, n.key);
             } else {
-                Point2D search1 = nearest(n.left, p, search);
-                Point2D search2 = nearest(n.right, p, search);
-                search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
+                search1 = nearest(n.left, p, search);
+                search2 = nearest(n.right, p, search);
             }
+            search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
         }
         return search;
     }
