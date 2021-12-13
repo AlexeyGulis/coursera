@@ -1,4 +1,3 @@
-package kdTree;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
@@ -63,5 +62,6 @@ public class PointSET {
     }
 
     public static void main(String[] args) {
+        //unit-test
     }
 }
