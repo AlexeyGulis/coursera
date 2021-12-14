@@ -168,57 +168,37 @@ public class KdTree {
         double searchDistance = search.distanceSquaredTo(p);
         if (n.rectHV.distanceSquaredTo(p) < searchDistance) {
             if (n.key.distanceSquaredTo(p) < searchDistance) {
-                if (rotate) {
-                    if (p.x() < n.key.x()) {
-                        search = nearest(n.left, p, n.key, false);
-                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.right, p, search, false);
-                        }
-                    } else {
-                        search = nearest(n.right, p, n.key, false);
-                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.left, p, search, false);
-                        }
-                    }
-                } else {
-                    if (p.y() < n.key.y()) {
-                        search = nearest(n.left, p, n.key, true);
-                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.right, p, search, true);
-                        }
-                    } else {
-                        search = nearest(n.right, p, n.key, true);
-                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.left, p, search, true);
-                        }
-                    }
+                search = nearestRotate(n, p, search, rotate, n.key);
+            } else {
+                search = nearestRotate(n, p, search, rotate, search);
+            }
+        }
+        return search;
+    }
+
+    private Point2D nearestRotate(Node n, Point2D p, Point2D search, boolean rotate, Point2D choose) {
+        if (rotate) {
+            if (p.x() < n.key.x()) {
+                search = nearest(n.left, p, choose, false);
+                if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
+                    search = nearest(n.right, p, search, false);
                 }
             } else {
-                if (rotate) {
-                    if (p.x() < n.key.x()) {
-                        search = nearest(n.left, p, search, false);
-                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.right, p, search, false);
-                        }
-                    } else {
-                        search = nearest(n.right, p, search, false);
-                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.left, p, search, false);
-                        }
-                    }
-
-                } else {
-                    if (p.y() < n.key.y()) {
-                        search = nearest(n.left, p, search, true);
-                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.right, p, search, true);
-                        }
-                    } else {
-                        search = nearest(n.right, p, search, true);
-                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
-                            search = nearest(n.left, p, search, true);
-                        }
-                    }
+                search = nearest(n.right, p, choose, false);
+                if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
+                    search = nearest(n.left, p, search, false);
+                }
+            }
+        } else {
+            if (p.y() < n.key.y()) {
+                search = nearest(n.left, p, choose, true);
+                if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
+                    search = nearest(n.right, p, search, true);
+                }
+            } else {
+                search = nearest(n.right, p, choose, true);
+                if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
+                    search = nearest(n.left, p, search, true);
                 }
             }
         }
