@@ -1,10 +1,9 @@
-package kdTree;
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
-import edu.princeton.cs.algs4.StdOut;
 
 public class KdTree {
 
@@ -168,74 +167,57 @@ public class KdTree {
         if (n == null) return search;
         double searchDistance = search.distanceSquaredTo(p);
         if (n.rectHV.distanceSquaredTo(p) < searchDistance) {
-            Point2D search1;
-            Point2D search2;
             if (n.key.distanceSquaredTo(p) < searchDistance) {
                 if (rotate) {
                     if (p.x() < n.key.x()) {
-                        search1 = nearest(n.left, p, n.key, false);
-                    } else {
-                        search1 = nearest(n.right, p, n.key, false);
-                    }
-                    if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search1.distanceSquaredTo(p)) {
-                        if (p.x() < n.key.x()) {
-                            search2 = nearest(n.right, p, n.key, false);
-                        } else {
-                            search2 = nearest(n.left, p, n.key, false);
+                        search = nearest(n.left, p, n.key, false);
+                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.right, p, search, false);
                         }
-                        search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
                     } else {
-                        search = search1;
+                        search = nearest(n.right, p, n.key, false);
+                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.left, p, search, false);
+                        }
                     }
                 } else {
                     if (p.y() < n.key.y()) {
-                        search1 = nearest(n.left, p, n.key, true);
-                    } else {
-                        search1 = nearest(n.right, p, n.key, true);
-                    }
-                    if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search1.distanceSquaredTo(p)) {
-                        if (p.y() < n.key.y()) {
-                            search2 = nearest(n.right, p, n.key, true);
-                        } else {
-                            search2 = nearest(n.left, p, n.key, true);
+                        search = nearest(n.left, p, n.key, true);
+                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.right, p, search, true);
                         }
-                        search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
                     } else {
-                        search = search1;
+                        search = nearest(n.right, p, n.key, true);
+                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.left, p, search, true);
+                        }
                     }
                 }
             } else {
                 if (rotate) {
                     if (p.x() < n.key.x()) {
-                        search1 = nearest(n.left, p, search, false);
-                    } else {
-                        search1 = nearest(n.right, p, search, false);
-                    }
-                    if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search1.distanceSquaredTo(p)) {
-                        if (p.x() < n.key.x()) {
-                            search2 = nearest(n.right, p, search, false);
-                        } else {
-                            search2 = nearest(n.left, p, search, false);
+                        search = nearest(n.left, p, search, false);
+                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.right, p, search, false);
                         }
-                        search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
                     } else {
-                        search = search1;
+                        search = nearest(n.right, p, search, false);
+                        if ((p.x() - n.key.x()) * (p.x() - n.key.x()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.left, p, search, false);
+                        }
                     }
+
                 } else {
                     if (p.y() < n.key.y()) {
-                        search1 = nearest(n.left, p, search, true);
-                    } else {
-                        search1 = nearest(n.right, p, search, true);
-                    }
-                    if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search1.distanceSquaredTo(p)) {
-                        if (p.y() < n.key.y()) {
-                            search2 = nearest(n.right, p, search, true);
-                        } else {
-                            search2 = nearest(n.left, p, search, true);
+                        search = nearest(n.left, p, search, true);
+                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.right, p, search, true);
                         }
-                        search = search1.distanceSquaredTo(p) < search2.distanceSquaredTo(p) ? search1 : search2;
                     } else {
-                        search = search1;
+                        search = nearest(n.right, p, search, true);
+                        if ((p.y() - n.key.y()) * (p.y() - n.key.y()) < search.distanceSquaredTo(p)) {
+                            search = nearest(n.left, p, search, true);
+                        }
                     }
                 }
             }
@@ -244,7 +226,21 @@ public class KdTree {
     }
 
     public static void main(String[] args) {
-        KdTree kdTree = new KdTree();
-        StdOut.println(kdTree.size());
+        String filename = args[0];
+        In in = new In(filename);
+        KdTree kdtree = new KdTree();
+        while (!in.isEmpty()) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            Point2D p = new Point2D(x, y);
+            kdtree.insert(p);
+        }
+        kdtree.draw();
+        StdDraw.setPenRadius(0.03);
+        StdDraw.setPenColor(StdDraw.RED);
+        Point2D p = new Point2D(0.25, 1.0);
+        p.draw();
+        StdDraw.show();
+        kdtree.nearest(p);
     }
 }
