@@ -3,9 +3,13 @@ package wordNet;
 import edu.princeton.cs.algs4.*;
 
 public class SAP {
+
     private Digraph cDigraph;
 
     public SAP(Digraph G) {
+        if(G == null){
+            throw new IllegalArgumentException();
+        }
         cDigraph = new Digraph(G);
     }
 
@@ -52,6 +56,9 @@ public class SAP {
 
 
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
+        if(v == null || w == null){
+            throw new IllegalArgumentException();
+        }
         BreadthFirstDirectedPaths bfd1 = new BreadthFirstDirectedPaths(cDigraph, v);
         BreadthFirstDirectedPaths bfd2 = new BreadthFirstDirectedPaths(cDigraph, w);
         int dist = 0;
@@ -71,6 +78,9 @@ public class SAP {
     }
 
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
+        if(v == null || w == null){
+            throw new IllegalArgumentException();
+        }
         BreadthFirstDirectedPaths bfd1 = new BreadthFirstDirectedPaths(cDigraph, v);
         BreadthFirstDirectedPaths bfd2 = new BreadthFirstDirectedPaths(cDigraph, w);
         int dist = 0;
