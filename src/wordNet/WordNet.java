@@ -2,13 +2,12 @@ package wordNet;
 
 import edu.princeton.cs.algs4.*;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class WordNet {
 
     private String[] synsets;
-    private Set<String> nouns;
+    private HashMap<String, TreeSet<Integer>> nouns;
     private Digraph G;
     private SAP sap;
 
@@ -16,7 +15,7 @@ public class WordNet {
         if (synsets == null || hypernyms == null) {
             throw new IllegalArgumentException();
         }
-        nouns = new TreeSet<>();
+        nouns = new HashMap<>();
         In in1 = new In(synsets);
         this.synsets = in1.readAllLines();
         for (int i = 0; i < this.synsets.length; i++) {
@@ -24,7 +23,12 @@ public class WordNet {
             this.synsets[i] = temp[1];
             temp = this.synsets[i].split(" ");
             for (int j = 0; j < temp.length; j++) {
-                nouns.add(temp[j]);
+                if (nouns.containsKey(temp[j])) {
+                    nouns.get(temp[j]).add(i);
+                } else {
+                    nouns.put(temp[j], new TreeSet<>());
+                    nouns.get(temp[j]).add(i);
+                }
             }
         }
         G = new Digraph(this.synsets.length);
@@ -39,63 +43,38 @@ public class WordNet {
     }
 
     public Iterable<String> nouns() {
-        return nouns;
+        return nouns.keySet();
     }
 
     public boolean isNoun(String word) {
         if (word == null) {
             throw new IllegalArgumentException();
         }
-        return nouns.contains(word);
+        return nouns.containsKey(word);
     }
 
     public int distance(String nounA, String nounB) {
         if (nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException();
         }
-        Set<Integer> listNounA = new TreeSet<>();
-        Set<Integer> listNounB = new TreeSet<>();
-        for (int i = 0; i < synsets.length; i++) {
-            String[] temp = synsets[i].split(" ");
-            for (String t : temp
-            ) {
-                if (t.equals(nounA)) {
-                    listNounA.add(i);
-                }
-                if (t.equals(nounB)) {
-                    listNounB.add(i);
-                }
-            }
+        if (nounA.equals(nounB)) {
+            return 0;
         }
-        return sap.length(listNounA, listNounB);
+        return sap.length(nouns.get(nounA), nouns.get(nounB));
     }
 
     public String sap(String nounA, String nounB) {
         if (nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException();
         }
-        Set<Integer> listNounA = new TreeSet<>();
-        Set<Integer> listNounB = new TreeSet<>();
-        for (int i = 0; i < synsets.length; i++) {
-            String[] temp = synsets[i].split(" ");
-            for (String t : temp
-            ) {
-                if (t.equals(nounA)) {
-                    listNounA.add(i);
-                }
-                if (t.equals(nounB)) {
-                    listNounB.add(i);
-                }
-            }
-        }
-        return synsets[sap.ancestor(listNounA,listNounB)];
+        return synsets[sap.ancestor(nouns.get(nounA), nouns.get(nounB))];
     }
 
     public static void main(String[] args) {
         WordNet t = new WordNet("E:\\JavaFolder\\coursera\\src\\wordNet\\synsets.txt", "E:\\JavaFolder\\coursera\\src\\wordNet\\hypernyms.txt");
         boolean ts = t.isNoun("worm");
-        System.out.println(t.distance("municipality", "region"));
-        System.out.println(t.sap("municipality", "region"));
+        System.out.println(t.distance("Ambrose", "Saint_Ambrose"));
+        System.out.println(t.sap("Ambrose", "Saint_Ambrose"));
         System.out.println(ts);
     }
 }
