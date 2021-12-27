@@ -2,7 +2,6 @@
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.DirectedCycle;
-import edu.princeton.cs.algs4.DirectedDFS;
 
 import java.util.TreeSet;
 import java.util.HashMap;
@@ -24,14 +23,18 @@ public class WordNet {
         createListNouns();
         G = new Digraph(this.synsets.length);
         In in2 = new In(hypernyms);
-        while (!in2.isEmpty()) {
-            String[] temp = in2.readLine().split(",");
+        createDigraph(in2);
+        checkCorrectDAG();
+        sap = new SAP(G);
+    }
+
+    private void createDigraph(In in) {
+        while (!in.isEmpty()) {
+            String[] temp = in.readLine().split(",");
             for (int i = 1; i < temp.length; i++) {
                 G.addEdge(Integer.parseInt(temp[0]), Integer.parseInt(temp[i]));
             }
         }
-        checkCorrectDAG();
-        sap = new SAP(G);
     }
 
     private void checkCorrectDAG() {
@@ -41,19 +44,15 @@ public class WordNet {
         }
         Iterator<Integer> iterator;
         boolean flag = true;
+        int count = 0;
         for (int i = 0; i < G.V(); i++) {
-            iterator = G.adj(i).iterator();
-            if (!iterator.hasNext()) {
-                DirectedDFS dfs = new DirectedDFS(G.reverse(), i);
-                for (int j = 0; j < G.V(); j++) {
-                    if (!dfs.marked(j)) {
-                        throw new IllegalArgumentException("More than 1 root");
-                    }
-                }
+            if (G.outdegree(i) == 0) {
+                count++;
                 flag = false;
             }
         }
-        if(flag) throw new IllegalArgumentException("No root");
+        if (flag) throw new IllegalArgumentException("No root");
+        if (count != 1) throw new IllegalArgumentException("More than 1 root");
     }
 
     private void createListNouns() {
@@ -102,7 +101,7 @@ public class WordNet {
     }
 
     public static void main(String[] args) {
-        WordNet t = new WordNet("D:\\java\\coursera\\src\\wordNet\\synsets.txt", "D:\\java\\coursera\\src\\wordNet\\hypernyms.txt");
+        WordNet t = new WordNet("D:\\java\\coursera\\src\\wordNet\\synsets6.txt", "D:\\java\\coursera\\src\\wordNet\\hypernyms6InvalidTwoRoots.txt");
         boolean ts = t.isNoun("worm");
         System.out.println(t.distance("Ambrose", "Saint_Ambrose"));
         System.out.println(t.sap("Ambrose", "Saint_Ambrose"));

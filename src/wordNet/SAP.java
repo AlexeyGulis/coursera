@@ -56,8 +56,11 @@ public class SAP {
 
 
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
-        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
+        if (v == null || w == null) {
             throw new IllegalArgumentException();
+        }
+        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
+            return -1;
         }
         BreadthFirstDirectedPaths bfd1 = new BreadthFirstDirectedPaths(cDigraph, v);
         BreadthFirstDirectedPaths bfd2 = new BreadthFirstDirectedPaths(cDigraph, w);
@@ -78,8 +81,11 @@ public class SAP {
     }
 
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
+        if (v == null || w == null) {
             throw new IllegalArgumentException();
+        }
+        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
+            return -1;
         }
         BreadthFirstDirectedPaths bfd1 = new BreadthFirstDirectedPaths(cDigraph, v);
         BreadthFirstDirectedPaths bfd2 = new BreadthFirstDirectedPaths(cDigraph, w);
