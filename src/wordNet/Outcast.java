@@ -1,4 +1,3 @@
-package wordNet;
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
@@ -15,11 +14,9 @@ public class Outcast {
         String outcast = "";
         for (int i = 0; i < listNoun.length; i++) {
             int temp = 0;
-            for (String p : wordNet.nouns()
-            ) {
-                temp += wordNet.distance(listNoun[i], p);
+            for (int j = 0; j < listNoun.length; j++) {
+                temp += wordNet.distance(listNoun[i], listNoun[j]);
             }
-            System.out.println(temp + listNoun[i]);
             if (minDistance == -1) {
                 minDistance = temp;
                 outcast = listNoun[i];

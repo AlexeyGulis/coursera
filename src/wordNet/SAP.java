@@ -1,13 +1,13 @@
-package wordNet;
 
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 
 public class SAP {
 
     private Digraph cDigraph;
 
     public SAP(Digraph G) {
-        if(G == null){
+        if (G == null) {
             throw new IllegalArgumentException();
         }
         cDigraph = new Digraph(G);
@@ -23,10 +23,10 @@ public class SAP {
                 int temp = bfd1.distTo(i) + bfd2.distTo(i);
                 if (!flag) {
                     dist = temp;
-                }else if(dist >= temp){
+                    flag = true;
+                } else if (dist > temp) {
                     dist = temp;
                 }
-                flag = true;
             }
         }
         return flag ? dist : -1;
@@ -44,11 +44,11 @@ public class SAP {
                 if (!flag) {
                     dist = temp;
                     minI = i;
-                }else if(dist >= temp){
+                    flag = true;
+                } else if (dist > temp) {
                     dist = temp;
                     minI = i;
                 }
-                flag = true;
             }
         }
         return flag ? minI : -1;
@@ -56,7 +56,7 @@ public class SAP {
 
 
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
-        if(v == null || w == null){
+        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
             throw new IllegalArgumentException();
         }
         BreadthFirstDirectedPaths bfd1 = new BreadthFirstDirectedPaths(cDigraph, v);
@@ -68,17 +68,17 @@ public class SAP {
                 int temp = bfd1.distTo(i) + bfd2.distTo(i);
                 if (!flag) {
                     dist = temp;
-                }else if(dist >= temp){
+                    flag = true;
+                } else if (dist > temp) {
                     dist = temp;
                 }
-                flag = true;
             }
         }
         return flag ? dist : -1;
     }
 
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        if(v == null || w == null){
+        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
             throw new IllegalArgumentException();
         }
         BreadthFirstDirectedPaths bfd1 = new BreadthFirstDirectedPaths(cDigraph, v);
@@ -92,26 +92,13 @@ public class SAP {
                 if (!flag) {
                     dist = temp;
                     minI = i;
-                }else if(dist >= temp){
+                    flag = true;
+                } else if (dist > temp) {
                     dist = temp;
                     minI = i;
                 }
-                flag = true;
             }
         }
         return flag ? minI : -1;
-    }
-
-    public static void main(String[] args) {
-        In in = new In(args[0]);
-        Digraph G = new Digraph(in);
-        SAP sap = new SAP(G);
-        while (!StdIn.isEmpty()) {
-            int v = StdIn.readInt();
-            int w = StdIn.readInt();
-            int length = sap.length(v, w);
-            int ancestor = sap.ancestor(v, w);
-            StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
-        }
     }
 }
