@@ -5,10 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class SeamCarver {
     private Picture pictureIn;
-    private int[][] imgRGB;
     private Picture pictureOut;
-    private static int width;
-    private static int height;
     private static boolean rotation;
     private static double[][] energy;
     private static double[][] distTo;
@@ -18,13 +15,15 @@ public class SeamCarver {
     public SeamCarver(Picture picture) {
         rotation = true;
         this.pictureIn = new Picture(picture);
-        width = picture.width();
-        height = picture.height();
         this.pictureOut = new Picture(picture);
-        imgRGB = new int[width][height];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                imgRGB[i][j] = picture.getRGB(i, j);
+        energy = new double[height()][width()];
+        for (int i = 0; i < height(); i++) {
+            for (int j = 0; j < width(); j++) {
+                if (rotation) {
+                    energy[i][j] = energy(j, i);
+                } else {
+                    energy[i][j] = energy(i, j);
+                }
             }
         }
         StdOut.println();
@@ -35,32 +34,32 @@ public class SeamCarver {
     }
 
     public int width() {
-        return width;
+        return pictureOut.width();
     }
 
     public int height() {
-        return height;
+        return pictureOut.height();
     }
 
     public double energy(int x, int y) {
-        if (x > width - 1 || x < 0 || y > height - 1 || y < 0) {
+        if (x > width() - 1 || x < 0 || y > height() - 1 || y < 0) {
             throw new IllegalArgumentException();
         }
-        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+        if (x == 0 || x == width() - 1 || y == 0 || y == height() - 1) {
             return 1000.0;
         }
         return Math.sqrt(deltaX(x, y) + deltaY(x, y));
     }
 
     private int deltaX(int x, int y) {
-        int rgb1 = imgRGB[x][y - 1];
-        int rgb2 = imgRGB[x][y + 1];
+        int rgb1 = picture().getRGB(x,y-1);
+        int rgb2 = picture().getRGB(x,y+1);
         return getDelta(rgb1, rgb2);
     }
 
     private int deltaY(int x, int y) {
-        int rgb1 = imgRGB[x - 1][y];
-        int rgb2 = imgRGB[x + 1][y];
+        int rgb1 = picture().getRGB(x-1,y);
+        int rgb2 = picture().getRGB(x+1,y);
         return getDelta(rgb1, rgb2);
     }
 
@@ -93,7 +92,9 @@ public class SeamCarver {
 
     public int[] findHorizontalSeam() {
         rotation = false;
+        energy = rorateEnergy(energy, height(), width(), 1);
         int[] result = findVerticalSeam();
+        energy = rorateEnergy(energy, width(), height(), 0);
         rotation = true;
         return result;
     }
@@ -130,6 +131,11 @@ public class SeamCarver {
         for (int i = height - 2; i >= 0; i--) {
             result[i] = edgeTo[i + 1][result[i + 1]];
         }
+        if(!rotation){
+           for (int i = 0; i < result.length; i++) {
+                result[i] = width - 1 - result[i];
+            }
+        }
         return result;
     }
 
@@ -143,7 +149,6 @@ public class SeamCarver {
             height = width();
             width = height();
         }
-        energy = new double[height][width];
         distTo = new double[height][width];
         edgeTo = new int[height][width];
         for (int i = 0; i < height; i++) {
@@ -156,15 +161,28 @@ public class SeamCarver {
                 }
             }
         }
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                if(rotation){
-                    energy[i][j] = energy(j, i);
-                }else{
-                    energy[i][j] = energy(i, j);
+    }
+
+    private static double[][] rorateEnergy
+            (double[][] imageArr, int rows, int columns, int flag) {
+
+        double rotatedImageArr[][] = new double[columns][rows];
+        if (flag == 1) {  //90 degree rotation in right
+            for (int i = 0; i < columns; i++) {
+                for (int j = 0; j < rows; j++) {
+                    rotatedImageArr[i][j] = imageArr[rows - 1 - j][i];
                 }
             }
         }
+
+        if (flag == 0) { //90 degree rotation in left
+            for (int i = 0; i < columns; i++) {
+                for (int j = 0; j < rows; j++) {
+                    rotatedImageArr[i][j] = imageArr[j][columns - 1 - i];
+                }
+            }
+        }
+        return rotatedImageArr;
     }
 
     public void removeVerticalSeam(int[] seam) {
@@ -174,6 +192,22 @@ public class SeamCarver {
                 throw new IllegalArgumentException();
             }
         }
+        Picture temp = new Picture(width(),height() - 1);
+        for (int i = 0; i < height(); i++) {
+            for (int j = 0; j < width(); j++) {
+                int i2 = i;
+                if(seam[i] != j){
+                    temp.setRGB(j,i2,pictureOut.getRGB(j,i));
+                    i2++;
+                }
+            }
+        }
+        pictureOut = temp;
+        revalueEnergy();
+    }
+
+    private void revalueEnergy(){
+
     }
 
     public void removeHorizontalSeam(int[] seam) {
@@ -183,7 +217,16 @@ public class SeamCarver {
                 throw new IllegalArgumentException();
             }
         }
-
+        Picture temp = new Picture(width() - 1,height());
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                if(width() - 1 - seam[i] != j){
+                    temp.setRGB(i,j,pictureOut.getRGB(i,j));
+                }
+            }
+        }
+        pictureOut = temp;
+        revalueEnergy();
     }
 
     public static void main(String[] args) {
