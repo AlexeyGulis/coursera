@@ -1,60 +1,45 @@
 package seamCarving;
 
 import edu.princeton.cs.algs4.Picture;
+import edu.princeton.cs.algs4.StdOut;
 
 public class SeamCarver {
-    private Picture picture;
-    private double[][] energy;
-    private int width = -1;
-    private int height = -1;
-    private double[][] distTo;
-    private int[][] edgeTo;
+    private Picture pictureIn;
+    private int[][] imgRGB;
+    private Picture pictureOut;
+    private static int width;
+    private static int height;
+    private static boolean rotation;
+    private static double[][] energy;
+    private static double[][] distTo;
+    private static int[][] edgeTo;
 
 
     public SeamCarver(Picture picture) {
-        this.picture = new Picture(picture);
+        rotation = true;
+        this.pictureIn = new Picture(picture);
         width = picture.width();
         height = picture.height();
-        energy = new double[height][width];
-        distTo = new double[height][width];
-        edgeTo = new int[height][width];
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                if (i == 0) {
-                    distTo[i][j] = 0;
-                    edgeTo[i][j] = i;
-                } else {
-                    distTo[i][j] = Double.POSITIVE_INFINITY;
-                }
-            }
-        }
+        this.pictureOut = new Picture(picture);
+        imgRGB = new int[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                energy[j][i] = energy(i, j);
+                imgRGB[i][j] = picture.getRGB(i, j);
             }
         }
+        StdOut.println();
     }
 
     public Picture picture() {
-        return picture;
+        return pictureOut;
     }
 
     public int width() {
-        if (width == -1) {
-            width = picture.width();
-            return width;
-        } else {
-            return width;
-        }
+        return width;
     }
 
     public int height() {
-        if (height == -1) {
-            height = picture.height();
-            return height;
-        } else {
-            return height;
-        }
+        return height;
     }
 
     public double energy(int x, int y) {
@@ -68,14 +53,14 @@ public class SeamCarver {
     }
 
     private int deltaX(int x, int y) {
-        int rgb1 = picture.getRGB(x, y - 1);
-        int rgb2 = picture.getRGB(x, y + 1);
+        int rgb1 = imgRGB[x][y - 1];
+        int rgb2 = imgRGB[x][y + 1];
         return getDelta(rgb1, rgb2);
     }
 
     private int deltaY(int x, int y) {
-        int rgb1 = picture.getRGB(x - 1, y);
-        int rgb2 = picture.getRGB(x + 1, y);
+        int rgb1 = imgRGB[x - 1][y];
+        int rgb2 = imgRGB[x + 1][y];
         return getDelta(rgb1, rgb2);
     }
 
@@ -90,6 +75,39 @@ public class SeamCarver {
     }
 
     public int[] findVerticalSeam() {
+        initialTopologicalSort();
+        return find();
+    }
+
+    private void relax(int i, int j, int k) {
+        if (i == 0) {
+            if (distTo[i + 1][j] > energy[i][k] + energy[i + 1][j]) {
+                distTo[i + 1][j] = energy[i][k] + energy[i + 1][j];
+                edgeTo[i + 1][j] = k;
+            }
+        } else if (distTo[i + 1][j] > distTo[i][k] + energy[i + 1][j]) {
+            distTo[i + 1][j] = distTo[i][k] + energy[i + 1][j];
+            edgeTo[i + 1][j] = k;
+        }
+    }
+
+    public int[] findHorizontalSeam() {
+        rotation = false;
+        int[] result = findVerticalSeam();
+        rotation = true;
+        return result;
+    }
+
+    private int[] find() {
+        int height;
+        int width;
+        if (rotation) {
+            height = height();
+            width = width();
+        } else {
+            height = width();
+            width = height();
+        }
         int[] result = new int[height];
         for (int i = 0; i < height - 1; i++) {
             for (int j = 0; j < width; j++) {
@@ -115,26 +133,44 @@ public class SeamCarver {
         return result;
     }
 
-    private void relax(int i, int j, int k) {
-        if (i == 0) {
-            if (distTo[i + 1][j] > energy[i][k] + energy[i + 1][j]) {
-                distTo[i + 1][j] = energy[i][k] + energy[i + 1][j];
-                edgeTo[i + 1][j] = k;
-            }
-        } else if (distTo[i + 1][j] > distTo[i][k] + energy[i + 1][j]) {
-            distTo[i + 1][j] = distTo[i][k] + energy[i + 1][j];
-            edgeTo[i + 1][j] = k;
+    private void initialTopologicalSort() {
+        int height;
+        int width;
+        if (rotation) {
+            height = height();
+            width = width();
+        } else {
+            height = width();
+            width = height();
         }
-    }
-
-    public int[] findHorizontalSeam() {
-        return null;
+        energy = new double[height][width];
+        distTo = new double[height][width];
+        edgeTo = new int[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (i == 0) {
+                    distTo[i][j] = 0;
+                    edgeTo[i][j] = i;
+                } else {
+                    distTo[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if(rotation){
+                    energy[i][j] = energy(j, i);
+                }else{
+                    energy[i][j] = energy(i, j);
+                }
+            }
+        }
     }
 
     public void removeVerticalSeam(int[] seam) {
         if (seam == null) throw new IllegalArgumentException();
-        for (int i = 0; i < height; i++) {
-            if(seam[i] >= height || seam[i] < 0){
+        for (int i = 0; i < height(); i++) {
+            if (seam[i] >= height() || seam[i] < 0) {
                 throw new IllegalArgumentException();
             }
         }
@@ -142,8 +178,8 @@ public class SeamCarver {
 
     public void removeHorizontalSeam(int[] seam) {
         if (seam == null) throw new IllegalArgumentException();
-        for (int i = 0; i < width; i++) {
-            if(seam[i] >= width || seam[i] < 0){
+        for (int i = 0; i < width(); i++) {
+            if (seam[i] >= width() || seam[i] < 0) {
                 throw new IllegalArgumentException();
             }
         }
