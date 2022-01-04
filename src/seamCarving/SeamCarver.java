@@ -5,13 +5,14 @@ import edu.princeton.cs.algs4.Picture;
 public class SeamCarver {
     private Picture pictureIn;
     private Picture pictureOut;
-    private static boolean rotation;
-    private static double[][] energy;
+    private boolean rotation;
+    private double[][] energy;
     private static double[][] distTo;
     private static int[][] edgeTo;
 
 
     public SeamCarver(Picture picture) {
+        if(picture == null) throw new IllegalArgumentException();
         rotation = true;
         this.pictureIn = new Picture(picture);
         this.pictureOut = new Picture(picture);
@@ -28,7 +29,8 @@ public class SeamCarver {
     }
 
     public Picture picture() {
-        return pictureOut;
+        Picture rePic = new Picture(pictureOut);
+        return rePic;
     }
 
     public int width() {
@@ -90,9 +92,9 @@ public class SeamCarver {
 
     public int[] findHorizontalSeam() {
         rotation = false;
-        energy = rotateEnergy(energy, energy.length, energy[0].length, 1);
+        energy = rotateEnergy(energy, height(), width(), 1);
         int[] result = findVerticalSeam();
-        energy = rotateEnergy(energy, energy.length, energy[0].length, 0);
+        energy = rotateEnergy(energy, width(), height(), 0);
         rotation = true;
         return result;
     }
@@ -210,25 +212,29 @@ public class SeamCarver {
     }
 
     private void revalueEnergyVertical(int[] seam) {
+        double[][] temp = new double[height()][width()];
         for (int i = 0; i < height(); i++) {
-            System.arraycopy(energy[i], seam[i] + 1, energy[i], seam[i], width() - seam[i]);
+            System.arraycopy(energy[i], 0, temp[i], 0, seam[i]);
+            System.arraycopy(energy[i], seam[i] + 1, temp[i], seam[i], width() - seam[i]);
         }
+        energy = temp;
         for (int i = 0; i < height(); i++) {
-            energy[i][seam[i]] = energy(seam[i], i);
-            if (seam[i] != 0) {
-                energy[i][seam[i] - 1] = energy(seam[i] - 1, i);
+            for (int j = 0; j < width(); j++) {
+                energy[i][j] = energy(j,i);
             }
         }
     }
 
     private void revalueEnergyHorizontal(int[] seam) {
+        double[][] temp = new double[width()][height()];
         for (int i = 0; i < width(); i++) {
-            System.arraycopy(energy[i], seam[width() - i - 1] + 1, energy[i], seam[width() - i - 1], height() - seam[width() - i - 1]);
+            System.arraycopy(energy[i], 0, temp[i], 0, seam[width() - i - 1]);
+            System.arraycopy(energy[i], seam[width() - i - 1] + 1, temp[i], seam[width() - i - 1], height() - seam[width() - i - 1]);
         }
+        energy = temp;
         for (int i = 0; i < width(); i++) {
-            energy[i][seam[width() - i - 1]] = energy(i, seam[i]);
-            if (seam[i] != 0 && seam[width() - i - 1] != 0) {
-                energy[i][seam[width() - i - 1] - 1] = energy(i, seam[i] - 1);
+            for (int j = 0; j < height(); j++) {
+                energy[i][j] = energy(i,j);
             }
         }
     }
@@ -255,10 +261,10 @@ public class SeamCarver {
                 }
             }
         }
+        energy = rotateEnergy(energy, height(), width(), 0);
         pictureOut = temp;
-        energy = rotateEnergy(energy, energy.length, energy[0].length, 0);
         revalueEnergyHorizontal(seam);
-        energy = rotateEnergy(energy, energy.length, energy[0].length, 1);
+        energy = rotateEnergy(energy, width(), height(), 1);
 
     }
 
