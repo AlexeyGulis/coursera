@@ -79,8 +79,7 @@ public class PrintSeams {
             StdOut.print(x + " ");
         StdOut.println("}");
         printSeam(carver, verticalSeam, VERTICAL);
-        int [] rrr = { 3, 4, 3, 3, 2, 3, 3, 4, 3, 4 };
-        carver.removeVerticalSeam(rrr);
+        //carver.removeVerticalSeam(carver.findVerticalSeam());
         StdOut.printf("Horizontal seam: { ");
         int[] horizontalSeam = carver.findHorizontalSeam();
         for (int y : horizontalSeam)
