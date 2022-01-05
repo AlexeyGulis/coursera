@@ -4,9 +4,7 @@ import sliderPuzzle.Board;
 
 public class Test {
     public static void main(String[] args) {
-        double a = Double.NaN;
-        double b = Double.NaN;
-        System.out.println(a == b);
-        System.out.println(Double.valueOf(a).equals(Double.valueOf(b)));
+        String hex = "F050908";
+        System.out.println(Integer.parseInt(hex,16));
     }
 }

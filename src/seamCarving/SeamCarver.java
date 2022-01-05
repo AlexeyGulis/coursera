@@ -1,6 +1,7 @@
 package seamCarving;
 
 import edu.princeton.cs.algs4.Picture;
+import edu.princeton.cs.algs4.StdOut;
 
 public class SeamCarver {
     private Picture pictureIn;
@@ -19,11 +20,7 @@ public class SeamCarver {
         energy = new double[height()][width()];
         for (int i = 0; i < height(); i++) {
             for (int j = 0; j < width(); j++) {
-                if (rotation) {
-                    energy[i][j] = energy(j, i);
-                } else {
-                    energy[i][j] = energy(i, j);
-                }
+                energy[i][j] = energy(j, i);
             }
         }
     }
@@ -232,9 +229,10 @@ public class SeamCarver {
             System.arraycopy(energy[i], seam[width() - i - 1] + 1, temp[i], seam[width() - i - 1], height() - seam[width() - i - 1]);
         }
         energy = temp;
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
-                energy[i][j] = energy(i,j);
+        energy = rotateEnergy(energy, width(), height(), 1);
+        for (int i = 0; i < height(); i++) {
+            for (int j = 0; j < width(); j++) {
+                energy[i][j] = energy(j,i);
             }
         }
     }
@@ -264,22 +262,43 @@ public class SeamCarver {
         energy = rotateEnergy(energy, height(), width(), 0);
         pictureOut = temp;
         revalueEnergyHorizontal(seam);
-        energy = rotateEnergy(energy, width(), height(), 1);
-
     }
 
     public static void main(String[] args) {
-        Picture pic = new Picture(6,6);
-        int[][] ppp = {{263170,263176,394761,1537,131337,198151},
-                {524806,131335,198404,264448,526601,133377},
-                {592131,590343,328706,132868,394758,132361},
-                {67073,66055,394753,132103,328968,525828},
-                {329987,262403,132610,197889,196617,67592},
-                {460805,1799,395011,460547,329735,394244}};
-        for (int i = 0; i < pic.height(); i++) {
-            for (int j = 0; j < pic.width(); j++) {
-
+        int[][] temp2 = new int[6][6];
+        String[] temp = {"#050908 #050407 #090100 #060008 #050402 #000201",
+                "#030309 #060706 #090404 #060005 #020800 #010204",
+                "#080907 #080103 #090105 #070702 #050208 #050305",
+                "#020005 #070007 #090903 #060404 #020502 #010303",
+                "#060000 #080407 #060305 #020707 #010808 #050603",
+                "#070706 #040604 #080202 #070508 #080602 #020006"
+        };
+        for (int i = 0; i < temp.length; i++) {
+            String[] temp1 = temp[i].split(" ");
+            for (int j = 0; j < temp1.length; j++) {
+                temp2[i][j] = Integer.parseInt(temp1[j].replace('#','F'),16);
             }
         }
+        Picture pic = new Picture(6,6);
+        for (int i = 0; i < pic.width(); i++) {
+            for (int j = 0; j < pic.height(); j++) {
+                pic.setRGB(j,i,temp2[i][j]);
+            }
+        }
+        SeamCarver carver = new SeamCarver(pic);
+        for (int i = 0; i < carver.width(); i++) {
+            for (int j = 0; j < carver.height(); j++) {
+                StdOut.printf("%7.2f ", carver.energy(j,i));
+            }
+            StdOut.println();
+        }
+        int[] r = {3, 4, 3, 2, 2, 1};
+        carver.removeHorizontalSeam(r);
+        carver.findHorizontalSeam();
+        int[] horizontalSeam = carver.findHorizontalSeam();
+        for (int y : horizontalSeam)
+            StdOut.print(y + " ");
+        StdOut.println("}");
+        PrintSeams.printSeam(carver, horizontalSeam, true);
     }
 }
