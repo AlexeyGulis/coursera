@@ -9,6 +9,7 @@ public class SeamCarverOpt {
     private final static boolean VERTICAL = false;
     private int width;
     private int height;
+    private int tempWidth;
     private double[] energyOpt;
     private static double[] distToOpt;
     private static int[] edgeToOpt;
@@ -18,16 +19,17 @@ public class SeamCarverOpt {
         if (picture == null) throw new IllegalArgumentException();
         width = picture.width();
         height = picture.height();
+        tempWidth = width;
         img = new int[height() * width()];
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-                img[twoDtoOneD(i, j, HORIZONTAL)] = picture.getRGB(i, j);
+                img[getIndex(i, j, HORIZONTAL)] = picture.getRGB(i, j);
             }
         }
         energyOpt = new double[height() * width()];
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
-                energyOpt[twoDtoOneD(i, j, VERTICAL)] = energy(i, j);
+        for (int i = 0; i < height(); i++) {
+            for (int j = 0; j < width(); j++) {
+                energyOpt[getIndex(i, j, VERTICAL)] = energy(j, i);
             }
         }
         isTranspose = VERTICAL;
@@ -37,7 +39,7 @@ public class SeamCarverOpt {
         Picture rePic = new Picture(width(), height());
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-                rePic.setRGB(i, j, img[twoDtoOneD(i, j, true)]);
+                rePic.setRGB(i, j, img[getIndex(i, j, HORIZONTAL)]);
             }
         }
         return rePic;
@@ -51,12 +53,8 @@ public class SeamCarverOpt {
         return height;
     }
 
-    private int twoDtoOneD(int i, int j, boolean rotation) {
-        return rotation ? i * height() + j : j * width() + i;
-    }
-
     private int getIndex(int i, int j, boolean isTranspose) {
-        return isTranspose ? j * width() + i : i * width() + j;
+        return isTranspose ? j * tempWidth + i : i * tempWidth + j;
     }
 
     public double energy(int x, int y) {
@@ -70,14 +68,14 @@ public class SeamCarverOpt {
     }
 
     private int deltaX(int x, int y) {
-        int rgb1 = img[twoDtoOneD(x, y - 1, true)];
-        int rgb2 = img[twoDtoOneD(x, y + 1, true)];
+        int rgb1 = img[getIndex(x, y - 1, HORIZONTAL)];
+        int rgb2 = img[getIndex(x, y + 1, HORIZONTAL)];
         return getDelta(rgb1, rgb2);
     }
 
     private int deltaY(int x, int y) {
-        int rgb1 = img[twoDtoOneD(x - 1, y, true)];
-        int rgb2 = img[twoDtoOneD(x + 1, y, true)];
+        int rgb1 = img[getIndex(x - 1, y, HORIZONTAL)];
+        int rgb2 = img[getIndex(x + 1, y, HORIZONTAL)];
         return getDelta(rgb1, rgb2);
     }
 
@@ -92,7 +90,6 @@ public class SeamCarverOpt {
     }
 
     public int[] findVerticalSeam() {
-        isTranspose = VERTICAL;
         distToOpt = new double[height() * width()];
         edgeToOpt = new int[height() * width()];
         for (int i = 0; i < height(); i++) {
@@ -131,39 +128,13 @@ public class SeamCarverOpt {
 
     public int[] findHorizontalSeam() {
         isTranspose = HORIZONTAL;
-        distToOpt = new double[height() * width()];
-        edgeToOpt = new int[height() * width()];
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
-                if (i == 0) {
-                    distToOpt[getIndex(i, j, isTranspose)] = 0;
-                } else {
-                    distToOpt[getIndex(i, j, isTranspose)] = Double.POSITIVE_INFINITY;
-                }
-            }
-        }
-        int[] result = new int[width()];
-        for (int i = 0; i < width() - 1; i++) {
-            for (int j = 0; j < height(); j++) {
-                if (j != 0) {
-                    relax(i, j - 1, j);
-                }
-                if (j != height() - 1) {
-                    relax(i, j + 1, j);
-                }
-                relax(i, j, j);
-            }
-        }
-        double min = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < height(); i++) {
-            if (min > distToOpt[getIndex(width() - 1, i, isTranspose)]) {
-                min = distToOpt[getIndex(width() - 1, i, isTranspose)];
-                result[width() - 1] = i;
-            }
-        }
-        for (int i = width - 2; i >= 0; i--) {
-            result[i] = edgeToOpt[getIndex(i + 1, result[i + 1], isTranspose)];
-        }
+        int temp = width;
+        width = height;
+        height = temp;
+        int[] result = findVerticalSeam();
+        height = width;
+        width = temp;
+        isTranspose = VERTICAL;
         return result;
     }
 
@@ -198,56 +169,63 @@ public class SeamCarverOpt {
             int j2 = 0;
             for (int j = 0; j < width(); j++) {
                 if (seam[i] != j) {
-                    temp[twoDtoOneD(j2, i, true)] = img[twoDtoOneD(j, i, true)];
+                    if (!isTranspose) temp[getIndex(i, j2, isTranspose) - i] = img[getIndex(i, j, isTranspose)];
+                    else temp[getIndex(i, j2, isTranspose)] = img[getIndex(i, j, isTranspose)];
                     j2++;
                 }
             }
         }
-        width--;
         img = temp;
-        isTranspose = VERTICAL;
         revalueEnergy(seam);
     }
+
     public void removeHorizontalSeam(int[] seam) {
-        if (seam == null || seam.length != width() || height() <= 1) throw new IllegalArgumentException();
-        for (int i = 0; i < width(); i++) {
-            if (seam[i] >= height() || seam[i] < 0) {
-                throw new IllegalArgumentException();
-            }
-            if (i != 0) {
-                if (Math.abs(seam[i - 1] - seam[i]) > 1 || Math.abs(seam[i - 1] - seam[i]) < 0) {
-                    throw new IllegalArgumentException();
-                }
-            }
-        }
-        int[] temp = new int[width() * (height() - 1)];
-        for (int i = 0; i < width(); i++) {
-            int j2 = 0;
-            for (int j = 0; j < height(); j++) {
-                if (seam[i] != j) {
-                    temp[twoDtoOneD(i, j2, true)] = img[twoDtoOneD(i, j, true)];
-                    j2++;
-                }
-            }
-        }
-        img = temp;
-        height--;
         isTranspose = HORIZONTAL;
-        revalueEnergy(seam);
+        int temp = width;
+        width = height;
+        height = temp;
+        removeVerticalSeam(seam);
+        isTranspose = VERTICAL;
     }
 
     private void revalueEnergy(int[] seam) {
         for (int i = 0; i < seam.length; i++) {
-            System.arraycopy(energyOpt, getIndex(i,seam[i],isTranspose) + 1 - i, energyOpt, getIndex(i,seam[i],isTranspose) - i, energyOpt.length - (getIndex(i,seam[i],isTranspose) + 1 - i));
+            if (isTranspose) {
+                for (int j = 0; j < width(); j++) {
+                    if (j > seam[i]) {
+                        energyOpt[getIndex(i, j - 1, isTranspose)] = energyOpt[getIndex(i, j, isTranspose)];
+                    }
+                }
+            } else {
+                System.arraycopy(energyOpt,
+                        getIndex(i, seam[i], isTranspose) + 1 - i,
+                        energyOpt,
+                        getIndex(i, seam[i], isTranspose) - i,
+                        energyOpt.length - (getIndex(i, seam[i], isTranspose) + 1 - i));
+            }
+
         }
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
-                energyOpt[twoDtoOneD(i, j, VERTICAL)] = energy(i, j);
+        width--;
+        if (!isTranspose) {
+            tempWidth = width;
+            for (int i = 0; i < seam.length; i++) {
+                energyOpt[getIndex(i, seam[i], isTranspose)] = energy(seam[i], i);
+                if (seam[i] != 0) {
+                    energyOpt[getIndex(i, seam[i] - 1, isTranspose)] = energy(seam[i] - 1, i);
+                }
+            }
+        } else {
+            int temp = width;
+            width = height;
+            height = temp;
+            for (int i = 0; i < seam.length; i++) {
+                energyOpt[getIndex(i, seam[i], isTranspose)] = energy(i, seam[i]);
+                if (seam[i] != 0) {
+                    energyOpt[getIndex(i, seam[i] - 1, isTranspose)] = energy(i, seam[i] - 1);
+                }
             }
         }
     }
-
-
 
     public static void main(String[] args) {
 

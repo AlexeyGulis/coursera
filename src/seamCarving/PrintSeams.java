@@ -31,6 +31,13 @@ package seamCarving;
  *  1000.00  1000.00  1000.00  1000.00  1000.00  1000.00  
  *  Total energy = 2530.681960
  *
+ * Vertical seam: { 1 2 2 1 }
+ * 1000.00  1000.00* 1000.00  1000.00  1000.00  1000.00
+ * 1000.00   146.57   125.24*  167.82   135.50  1000.00
+ * 1000.00   253.42   174.01*  227.49   194.50  1000.00
+ * 1000.00  1000.00* 1000.00  1000.00  1000.00  1000.00
+ * Total energy = 2299.248391
+ *
  ******************************************************************************/
 
 import edu.princeton.cs.algs4.Picture;
@@ -40,7 +47,7 @@ public class PrintSeams {
     private static final boolean HORIZONTAL   = true;
     private static final boolean VERTICAL     = false;
 
-    public static void printSeam(SeamCarver carver, int[] seam, boolean direction) {
+    public static void printSeam(SeamCarverOpt carver, int[] seam, boolean direction) {
         double totalSeamEnergy = 0.0;
 
         for (int row = 0; row < carver.height(); row++) {
@@ -71,8 +78,15 @@ public class PrintSeams {
         StdOut.println("The asterisks denote a minimum energy vertical or horizontal seam.");
         StdOut.println();
 
-        SeamCarver carver = new SeamCarver(picture);
+        SeamCarverOpt carver = new SeamCarverOpt(picture);
 
+        StdOut.printf("Horizontal seam: { ");
+        int[] horizontalSeam = carver.findHorizontalSeam();
+        for (int y : horizontalSeam)
+            StdOut.print(y + " ");
+        StdOut.println("}");
+        printSeam(carver, horizontalSeam, HORIZONTAL);
+        carver.removeHorizontalSeam(horizontalSeam);
         StdOut.printf("Vertical seam: { ");
         int[] verticalSeam = carver.findVerticalSeam();
         for (int x : verticalSeam)
@@ -80,14 +94,7 @@ public class PrintSeams {
         StdOut.println("}");
         printSeam(carver, verticalSeam, VERTICAL);
         carver.removeVerticalSeam(carver.findVerticalSeam());
-        StdOut.printf("Horizontal seam: { ");
-        int[] horizontalSeam = carver.findHorizontalSeam();
-        for (int y : horizontalSeam)
-            StdOut.print(y + " ");
-        StdOut.println("}");
-        printSeam(carver, horizontalSeam, HORIZONTAL);
 
-        //carver.removeHorizontalSeam(horizontalSeam);
     }
 
 }
