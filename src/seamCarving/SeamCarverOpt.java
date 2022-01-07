@@ -209,7 +209,9 @@ public class SeamCarverOpt {
         if (!isTranspose) {
             tempWidth = width;
             for (int i = 0; i < seam.length; i++) {
-                energyOpt[getIndex(i, seam[i], isTranspose)] = energy(seam[i], i);
+                if (seam[i] != width()) {
+                    energyOpt[getIndex(i, seam[i], isTranspose)] = energy(seam[i], i);
+                }
                 if (seam[i] != 0) {
                     energyOpt[getIndex(i, seam[i] - 1, isTranspose)] = energy(seam[i] - 1, i);
                 }
@@ -219,7 +221,9 @@ public class SeamCarverOpt {
             width = height;
             height = temp;
             for (int i = 0; i < seam.length; i++) {
-                energyOpt[getIndex(i, seam[i], isTranspose)] = energy(i, seam[i]);
+                if (seam[i] != height()) {
+                    energyOpt[getIndex(i, seam[i], isTranspose)] = energy(i, seam[i]);
+                }
                 if (seam[i] != 0) {
                     energyOpt[getIndex(i, seam[i] - 1, isTranspose)] = energy(i, seam[i] - 1);
                 }
