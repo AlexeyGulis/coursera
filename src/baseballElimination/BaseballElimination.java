@@ -41,7 +41,7 @@ public class BaseballElimination {
         fordFulkerson = new FordFulkerson[size];
         calcFlowNetwork(3);
         System.out.println(flowNetwork[3].toString());
-        System.out.println(fordFulkerson[3].inCut(7));
+        System.out.println(fordFulkerson[3].inCut(4));
     }
 
     public int numberOfTeams() {
@@ -102,7 +102,7 @@ public class BaseballElimination {
                     }
                 }
                 if (j != i) {
-                    flowNetwork[i].addEdge(new FlowEdge(((size - 1) * (size - 2) / 2) + 1 + count1, ((size - 1) * (size - 2) / 2) + (size - 1) + 1, Math.abs(w[i] + r[i] - w[j])));
+                    flowNetwork[i].addEdge(new FlowEdge(((size - 1) * (size - 2) / 2) + 1 + count1, ((size - 1) * (size - 2) / 2) + (size - 1) + 1, w[i] + r[i] - w[j] >= 0 ? w[i] + r[i] - w[j] : 0));
                     count1++;
                 }
             }
