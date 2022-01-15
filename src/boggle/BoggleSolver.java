@@ -1,16 +1,13 @@
 package boggle;
 
-import edu.princeton.cs.algs4.DepthFirstSearch;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.TST;
 
 import java.util.TreeSet;
 
 public class BoggleSolver {
 
     private String[] dictionary;
-    private TST<Integer> tries;
     private StringST<Integer> testTries;
     private int row;
     private int col;
@@ -33,7 +30,6 @@ public class BoggleSolver {
         row = board.rows();
         col = board.cols();
         marked = new boolean[row * col];
-        int[] edgeTo = new int[row * col];
         this.board = board;
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
