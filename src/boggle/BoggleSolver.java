@@ -46,7 +46,7 @@ public class BoggleSolver {
             return;
         }
         if (key.length() >= 3 && testTries.contains(key)) {
-            setWords.add(key);
+            setWords.add(dictionary[testTries.get(key)]);
         }
         if (i != 0) {
             if (!marked[oneDtoTwoD(i - 1, j)]) {
