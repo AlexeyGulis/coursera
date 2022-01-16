@@ -12,14 +12,25 @@ public class TrieSet {
     public TrieSet() {
     }
 
-    public boolean containsPrefix(String key) {
+    public TrieSet.Node containsPrefix(String key) {
         if (key == null) {
             throw new IllegalArgumentException("calls get() with null argument");
         } else if (key.length() == 0) {
             throw new IllegalArgumentException("key must have length >= 1");
         } else {
             TrieSet.Node x = this.get(this.root, key, 0);
-            return x == null ? false : true;
+            return x == null ? null : x;
+        }
+    }
+
+    public TrieSet.Node containsPrefix(TrieSet.Node temp, String key, int d) {
+        if (key == null) {
+            throw new IllegalArgumentException("calls get() with null argument");
+        } else if (key.length() == 0) {
+            throw new IllegalArgumentException("key must have length >= 1");
+        } else {
+            TrieSet.Node x = this.get(temp, key, d);
+            return x == null ? null : x;
         }
     }
 
@@ -199,7 +210,7 @@ public class TrieSet {
         }
     }
 
-    private static class Node {
+    public static class Node {
         private TrieSet.Node[] next;
         private boolean isString;
 

@@ -34,78 +34,85 @@ public class BoggleSolver {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 if (board.getLetter(i, j) != 'Q') {
-                    dfs(new StringBuilder().append(board.getLetter(i, j)), i, j);
+                    dfs(new StringBuilder().append(board.getLetter(i, j)), i, j, null);
                 } else {
-                    dfs(new StringBuilder().append("QU"), i, j);
+                    dfs(new StringBuilder().append("QU"), i, j, null);
                 }
             }
         }
         return setWords;
     }
 
-    private void dfs(StringBuilder key, int i, int j) {
+    private void dfs(StringBuilder key, int i, int j, TrieSet.Node temp) {
         marked[oneDtoTwoD(i, j)] = true;
-        if (key.length() >= 3 && !testTries.containsPrefix(key.toString())) {
-            marked[oneDtoTwoD(i, j)] = false;
-            return;
+        if (key.length() >= 3) {
+            if (temp == null) {
+                temp = testTries.containsPrefix(key.toString());
+            } else {
+                temp = testTries.containsPrefix(temp, key.toString(), key.length() - 1);
+            }
+            if (temp == null) {
+                marked[oneDtoTwoD(i, j)] = false;
+                return;
+            }
         }
         if (key.length() >= 3 && testTries.contains(key.toString())) {
             setWords.add(key.toString());
         }
         if (i != 0 && !marked[oneDtoTwoD(i - 1, j)]) {
             if (board.getLetter(i - 1, j) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j)), i - 1, j);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j)), i - 1, j, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i - 1, j);
+                dfs(new StringBuilder().append(key).append("QU"), i - 1, j, null);
             }
         }
         if (i != 0 && j != col - 1 && !marked[oneDtoTwoD(i - 1, j + 1)]) {
             if (board.getLetter(i - 1, j + 1) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j + 1)), i - 1, j + 1);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j + 1)), i - 1, j + 1, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i - 1, j + 1);
+                dfs(new StringBuilder().append(key).append("QU"), i - 1, j + 1, null);
             }
         }
         if (j != col - 1 && !marked[oneDtoTwoD(i, j + 1)]) {
             if (board.getLetter(i, j + 1) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i, j + 1)), i, j + 1);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i, j + 1)), i, j + 1, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i, j + 1);
+                dfs(new StringBuilder().append(key).append("QU"), i, j + 1, null);
             }
         }
         if (i != row - 1 && j != col - 1 && !marked[oneDtoTwoD(i + 1, j + 1)]) {
             if (board.getLetter(i + 1, j + 1) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j + 1)), i + 1, j + 1);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j + 1)), i + 1, j + 1, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i + 1, j + 1);
+                dfs(new StringBuilder().append(key).append("QU"), i + 1, j + 1, null);
             }
         }
         if (i != row - 1 && !marked[oneDtoTwoD(i + 1, j)]) {
             if (board.getLetter(i + 1, j) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j)), i + 1, j);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j)), i + 1, j, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i + 1, j);
+                dfs(new StringBuilder().append(key).append("QU"), i + 1, j, null);
             }
         }
         if (i != row - 1 && j != 0 && !marked[oneDtoTwoD(i + 1, j - 1)]) {
             if (board.getLetter(i + 1, j - 1) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j - 1)), i + 1, j - 1);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j - 1)), i + 1, j - 1, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i + 1, j - 1);
+                dfs(new StringBuilder().append(key).append("QU"), i + 1, j - 1, null);
             }
         }
         if (j != 0 && !marked[oneDtoTwoD(i, j - 1)]) {
             if (board.getLetter(i, j - 1) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i, j - 1)), i, j - 1);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i, j - 1)), i, j - 1, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i, j - 1);
+                dfs(new StringBuilder().append(key).append("QU"), i, j - 1, null);
             }
         }
         if (j != 0 && i != 0 && !marked[oneDtoTwoD(i - 1, j - 1)]) {
             if (board.getLetter(i - 1, j - 1) != 'Q') {
-                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j - 1)), i - 1, j - 1);
+                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j - 1)), i - 1, j - 1, temp);
             } else {
-                dfs(new StringBuilder().append(key).append("QU"), i - 1, j - 1);
+                dfs(new StringBuilder().append(key).append("QU"), i - 1, j - 1, null);
             }
         }
         marked[oneDtoTwoD(i, j)] = false;
