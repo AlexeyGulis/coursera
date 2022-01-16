@@ -45,7 +45,7 @@ public class BoggleSolver {
 
     private void dfs(StringBuilder key, int i, int j) {
         marked[oneDtoTwoD(i, j)] = true;
-        if (!testTries.containsPrefix(key.toString())) {
+        if (key.length() >= 3 && !testTries.containsPrefix(key.toString())) {
             marked[oneDtoTwoD(i, j)] = false;
             return;
         }
