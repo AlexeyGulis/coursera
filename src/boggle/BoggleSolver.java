@@ -26,73 +26,92 @@ public class BoggleSolver {
 
     public Iterable<String> getAllValidWords(BoggleBoard board) {
         setWords = new TreeSet<>();
-        String key = "";
         row = board.rows();
         col = board.cols();
         marked = new boolean[row * col];
         this.board = board;
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                dfs(key + board.getLetter(i, j), i, j);
+                if (board.getLetter(i, j) != 'Q') {
+                    dfs(new StringBuilder().append(board.getLetter(i, j)), i, j);
+                } else {
+                    dfs(new StringBuilder().append("QU"), i, j);
+                }
             }
         }
         return setWords;
     }
 
-    private void dfs(String key, int i, int j) {
+    private void dfs(StringBuilder key, int i, int j) {
         marked[oneDtoTwoD(i, j)] = true;
         if (!testTries.containsPrefix(key.toString())) {
             marked[oneDtoTwoD(i, j)] = false;
             return;
         }
-        if (key.length() >= 3 && testTries.contains(key)) {
-            setWords.add(dictionary[testTries.get(key)]);
+        if (key.length() >= 3 && testTries.contains(key.toString())) {
+            setWords.add(dictionary[testTries.get(key.toString())]);
         }
-        if (i != 0) {
-            if (!marked[oneDtoTwoD(i - 1, j)]) {
-                dfs(key + board.getLetter(i - 1, j), i - 1, j);
+        if (i != 0 && !marked[oneDtoTwoD(i - 1, j)]) {
+            if (board.getLetter(i - 1, j) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j)), i - 1, j);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i - 1, j);
             }
         }
-        if (i != 0 && j != col - 1) {
-            if (!marked[oneDtoTwoD(i - 1, j + 1)]) {
-                dfs(key + board.getLetter(i - 1, j + 1), i - 1, j + 1);
+        if (i != 0 && j != col - 1 && !marked[oneDtoTwoD(i - 1, j + 1)]) {
+            if (board.getLetter(i - 1, j + 1) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j + 1)), i - 1, j + 1);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i - 1, j + 1);
             }
         }
-        if (j != col - 1) {
-            if (!marked[oneDtoTwoD(i, j + 1)]) {
-                dfs(key + board.getLetter(i, j + 1), i, j + 1);
+        if (j != col - 1 && !marked[oneDtoTwoD(i, j + 1)]) {
+            if (board.getLetter(i, j + 1) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i, j + 1)), i, j + 1);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i, j + 1);
             }
         }
-        if (i != row - 1 && j != col - 1) {
-            if (!marked[oneDtoTwoD(i + 1, j + 1)]) {
-                dfs(key + board.getLetter(i + 1, j + 1), i + 1, j + 1);
+        if (i != row - 1 && j != col - 1 && !marked[oneDtoTwoD(i + 1, j + 1)]) {
+            if (board.getLetter(i + 1, j + 1) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j + 1)), i + 1, j + 1);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i + 1, j + 1);
             }
         }
-        if (i != row - 1) {
-            if (!marked[oneDtoTwoD(i + 1, j)]) {
-                dfs(key + board.getLetter(i + 1, j), i + 1, j);
+        if (i != row - 1 && !marked[oneDtoTwoD(i + 1, j)]) {
+            if (board.getLetter(i + 1, j) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j)), i + 1, j);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i + 1, j);
             }
         }
-        if (i != row - 1 && j != 0) {
-            if (!marked[oneDtoTwoD(i + 1, j - 1)]) {
-                dfs(key + board.getLetter(i + 1, j - 1), i + 1, j - 1);
+        if (i != row - 1 && j != 0 && !marked[oneDtoTwoD(i + 1, j - 1)]) {
+            if (board.getLetter(i + 1, j - 1) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i + 1, j - 1)), i + 1, j - 1);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i + 1, j - 1);
             }
         }
-        if (j != 0) {
-            if (!marked[oneDtoTwoD(i, j - 1)]) {
-                dfs(key + board.getLetter(i, j - 1), i, j - 1);
+        if (j != 0 && !marked[oneDtoTwoD(i, j - 1)]) {
+            if (board.getLetter(i, j - 1) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i, j - 1)), i, j - 1);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i, j - 1);
             }
         }
-        if (j != 0 && i != 0) {
-            if (!marked[oneDtoTwoD(i - 1, j - 1)]) {
-                dfs(key + board.getLetter(i - 1, j - 1), i - 1, j - 1);
+        if (j != 0 && i != 0 && !marked[oneDtoTwoD(i - 1, j - 1)]) {
+            if (board.getLetter(i - 1, j - 1) != 'Q') {
+                dfs(new StringBuilder().append(key).append(board.getLetter(i - 1, j - 1)), i - 1, j - 1);
+            } else {
+                dfs(new StringBuilder().append(key).append("QU"), i - 1, j - 1);
             }
         }
         marked[oneDtoTwoD(i, j)] = false;
     }
 
     private int oneDtoTwoD(int i, int j) {
-        return i * row + j;
+        return i * col + j;
     }
 
     public int scoreOf(String word) {
