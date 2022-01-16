@@ -1,9 +1,6 @@
 package boggle;
 
 import edu.princeton.cs.algs4.Queue;
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.TrieSET;
 
 import java.util.Iterator;
 
@@ -42,7 +39,7 @@ public class TrieSet {
             return x;
         } else {
             char c = key.charAt(d);
-            return this.get(x.next[c], key, d + 1);
+            return this.get(x.next[c - 65], key, d + 1);
         }
     }
 
@@ -67,7 +64,7 @@ public class TrieSet {
             x.isString = true;
         } else {
             char c = key.charAt(d);
-            x.next[c] = this.add(x.next[c], key, d + 1);
+            x.next[c - 65] = this.add(x.next[c - 65], key, d + 1);
         }
 
         return x;
@@ -86,7 +83,7 @@ public class TrieSet {
     }
 
     public Iterable<String> keysWithPrefix(String prefix) {
-        Queue<String> results = new Queue();
+        Queue<String> results = new Queue<>();
         TrieSet.Node x = this.get(this.root, prefix, 0);
         this.collect(x, new StringBuilder(prefix), results);
         return results;
@@ -98,9 +95,9 @@ public class TrieSet {
                 results.enqueue(prefix.toString());
             }
 
-            for(char c = 0; c < 26; ++c) {
+            for (char c = 65; c < 91; ++c) {
                 prefix.append(c);
-                this.collect(x.next[c], prefix, results);
+                this.collect(x.next[c - 65], prefix, results);
                 prefix.deleteCharAt(prefix.length() - 1);
             }
 
@@ -108,7 +105,7 @@ public class TrieSet {
     }
 
     public Iterable<String> keysThatMatch(String pattern) {
-        Queue<String> results = new Queue();
+        Queue<String> results = new Queue<>();
         StringBuilder prefix = new StringBuilder();
         this.collect(this.root, prefix, pattern, results);
         return results;
@@ -124,14 +121,14 @@ public class TrieSet {
             if (d != pattern.length()) {
                 char c = pattern.charAt(d);
                 if (c == '.') {
-                    for(char ch = 0; ch < 26; ++ch) {
+                    for (char ch = 65; ch < 91; ++ch) {
                         prefix.append(ch);
-                        this.collect(x.next[ch], prefix, pattern, results);
+                        this.collect(x.next[ch - 65], prefix, pattern, results);
                         prefix.deleteCharAt(prefix.length() - 1);
                     }
                 } else {
                     prefix.append(c);
-                    this.collect(x.next[c], prefix, pattern, results);
+                    this.collect(x.next[c - 65], prefix, pattern, results);
                     prefix.deleteCharAt(prefix.length() - 1);
                 }
 
@@ -160,7 +157,7 @@ public class TrieSet {
                 return length;
             } else {
                 char c = query.charAt(d);
-                return this.longestPrefixOf(x.next[c], query, d + 1, length);
+                return this.longestPrefixOf(x.next[c - 65], query, d + 1, length);
             }
         }
     }
@@ -185,13 +182,13 @@ public class TrieSet {
                 x.isString = false;
             } else {
                 char c = key.charAt(d);
-                x.next[c] = this.delete(x.next[c], key, d + 1);
+                x.next[c - 65] = this.delete(x.next[c - 65], key, d + 1);
             }
 
             if (x.isString) {
                 return x;
             } else {
-                for(int c = 0; c < 26; ++c) {
+                for (int c = 0; c < 26; ++c) {
                     if (x.next[c] != null) {
                         return x;
                     }
@@ -200,62 +197,6 @@ public class TrieSet {
                 return null;
             }
         }
-    }
-
-    public static void main(String[] args) {
-        TrieSET set = new TrieSET();
-
-        while(!StdIn.isEmpty()) {
-            String key = StdIn.readString();
-            set.add(key);
-        }
-
-        String s;
-        Iterator var4;
-        if (set.size() < 100) {
-            StdOut.println("keys(\"\"):");
-            var4 = set.iterator();
-
-            while(var4.hasNext()) {
-                s = (String)var4.next();
-                StdOut.println(s);
-            }
-
-            StdOut.println();
-        }
-
-        StdOut.println("longestPrefixOf(\"shellsort\"):");
-        StdOut.println(set.longestPrefixOf("shellsort"));
-        StdOut.println();
-        StdOut.println("longestPrefixOf(\"xshellsort\"):");
-        StdOut.println(set.longestPrefixOf("xshellsort"));
-        StdOut.println();
-        StdOut.println("keysWithPrefix(\"shor\"):");
-        var4 = set.keysWithPrefix("shor").iterator();
-
-        while(var4.hasNext()) {
-            s = (String)var4.next();
-            StdOut.println(s);
-        }
-
-        StdOut.println();
-        StdOut.println("keysWithPrefix(\"shortening\"):");
-        var4 = set.keysWithPrefix("shortening").iterator();
-
-        while(var4.hasNext()) {
-            s = (String)var4.next();
-            StdOut.println(s);
-        }
-
-        StdOut.println();
-        StdOut.println("keysThatMatch(\".he.l.\"):");
-        var4 = set.keysThatMatch(".he.l.").iterator();
-
-        while(var4.hasNext()) {
-            s = (String)var4.next();
-            StdOut.println(s);
-        }
-
     }
 
     private static class Node {

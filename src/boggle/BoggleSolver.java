@@ -3,12 +3,13 @@ package boggle;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+
 import java.util.TreeSet;
 
 public class BoggleSolver {
 
     private String[] dictionary;
-    private StringST<Integer> testTries;
+    private TrieSet testTries;
     private int row;
     private int col;
     private boolean[] marked;
@@ -16,11 +17,11 @@ public class BoggleSolver {
     private TreeSet<String> setWords;
 
     public BoggleSolver(String[] dictionary) {
-        testTries = new StringST<>();
+        testTries = new TrieSet();
         this.dictionary = new String[dictionary.length];
         for (int i = 0; i < dictionary.length; i++) {
             this.dictionary[i] = dictionary[i];
-            testTries.put(dictionary[i], i);
+            testTries.add(dictionary[i]);
         }
     }
 
@@ -49,7 +50,7 @@ public class BoggleSolver {
             return;
         }
         if (key.length() >= 3 && testTries.contains(key.toString())) {
-            setWords.add(dictionary[testTries.get(key.toString())]);
+            setWords.add(key.toString());
         }
         if (i != 0 && !marked[oneDtoTwoD(i - 1, j)]) {
             if (board.getLetter(i - 1, j) != 'Q') {
