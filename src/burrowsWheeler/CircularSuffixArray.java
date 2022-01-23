@@ -35,7 +35,7 @@ public class CircularSuffixArray {
             this.i = i;
         }
 
-        public int getI() {
+        private int getI() {
             return i;
         }
 
