@@ -65,8 +65,6 @@ public class CircularSuffixArray {
 
     public static void main(String[] args) {
         CircularSuffixArray circularSuffixArray = new CircularSuffixArray("ABRACADABRA!");
-        System.out.println(circularSuffixArray.length());
-        System.out.println(circularSuffixArray.index(1));
     }
 
 }
