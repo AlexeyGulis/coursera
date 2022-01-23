@@ -11,7 +11,7 @@ public class MoveToFront {
         }
         char[] input = BinaryStdIn.readString().toCharArray();
         for (int i = 0; i < input.length; i++) {
-            for (int j = 0; j < alphabet.length; i++) {
+            for (int j = 0; j < alphabet.length; j++) {
                 if (alphabet[j] == input[i]) {
                     BinaryStdOut.write((char) j, 8);
                     System.arraycopy(alphabet, 0, alphabet, 1, j);
@@ -28,22 +28,20 @@ public class MoveToFront {
             alphabet[i] = (char) i;
         }
         char[] input = BinaryStdIn.readString().toCharArray();
+        StringBuilder str = new StringBuilder();
         for (int i = 0; i < input.length; i++) {
-            for (int j = 0; j < alphabet.length; i++) {
-                if (alphabet[j] == input[i]) {
-                    BinaryStdOut.write(alphabet[j], 8);
-                    System.arraycopy(alphabet, 0, alphabet, 1, j);
-                    alphabet[0] = input[i];
-                }
-            }
+            BinaryStdOut.write(alphabet[input[i]], 8);
+            char temp = alphabet[input[i]];
+            System.arraycopy(alphabet, 0, alphabet, 1, input[i]);
+            alphabet[0] = temp;
         }
         BinaryStdOut.close();
     }
 
     public static void main(String[] args) {
-        if(args[0].equals("-")){
+        if (args[0].equals("-")) {
             encode();
-        }else if(args[0].equals("+")){
+        } else if (args[0].equals("+")) {
             decode();
         }
     }

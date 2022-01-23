@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 public class BurrowsWheeler {
     private static char[] t;
+
     public static void transform() {
         if (BinaryStdIn.isEmpty()) return;
         String str = BinaryStdIn.readString();
@@ -36,7 +37,7 @@ public class BurrowsWheeler {
         Arrays.sort(customs);
         int j = start;
         for (int i = 0; i < t.length; i++) {
-            if(i == 0) j = start;
+            if (i == 0) j = start;
             BinaryStdOut.write(customs[j].getB());
             j = customs[j].getI();
         }
@@ -45,6 +46,7 @@ public class BurrowsWheeler {
     private static class Custom implements Comparable<Custom> {
         private int i;
         private char b;
+
         private Custom(int i, char b) {
             this.i = i;
             this.b = b;
@@ -53,9 +55,11 @@ public class BurrowsWheeler {
         private int getI() {
             return i;
         }
-        private char getB(){
+
+        private char getB() {
             return b;
         }
+
         @Override
         public int compareTo(Custom o) {
             return t[this.getI()] > t[o.getI()] ? 1 : t[this.getI()] < t[o.getI()] ? -1 : 0;

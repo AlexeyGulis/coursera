@@ -24,7 +24,7 @@ public class CircularSuffixArray {
     }
 
     public int index(int i) {
-        if (i < 0 && i >= n) throw new IllegalArgumentException();
+        if (i < 0 || i >= n) throw new IllegalArgumentException();
         return circularSuffix[i].getI();
     }
 
