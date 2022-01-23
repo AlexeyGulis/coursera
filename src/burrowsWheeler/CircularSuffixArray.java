@@ -1,5 +1,4 @@
 package burrowsWheeler;
-
 import java.util.Arrays;
 
 public class CircularSuffixArray {

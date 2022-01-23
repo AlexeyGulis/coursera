@@ -1,5 +1,4 @@
 package burrowsWheeler;
-
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
@@ -38,7 +37,7 @@ public class BurrowsWheeler {
         int j = start;
         for (int i = 0; i < t.length; i++) {
             if (i == 0) j = start;
-            BinaryStdOut.write(customs[j].getB());
+            BinaryStdOut.write(customs[j].getB(), 8);
             j = customs[j].getI();
         }
     }
