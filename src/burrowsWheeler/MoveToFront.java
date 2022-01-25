@@ -1,11 +1,12 @@
 package burrowsWheeler;
+
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
 public class MoveToFront {
     public static void encode() {
         char[] alphabet = new char[256];
-        for (int i = 0; i < alphabet.length; i++) {
+        for (int i = 0; i < 256; i++) {
             alphabet[i] = (char) i;
         }
         while (!BinaryStdIn.isEmpty()) {
@@ -15,6 +16,7 @@ public class MoveToFront {
                     BinaryStdOut.write((char) j, 8);
                     System.arraycopy(alphabet, 0, alphabet, 1, j);
                     alphabet[0] = temp;
+                    break;
                 }
             }
         }
