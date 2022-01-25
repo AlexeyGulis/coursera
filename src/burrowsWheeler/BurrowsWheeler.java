@@ -2,10 +2,7 @@ package burrowsWheeler;
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
-import java.util.Arrays;
-
 public class BurrowsWheeler {
-    private static char[] t;
 
     public static void transform() {
         if (BinaryStdIn.isEmpty()) return;
@@ -23,46 +20,32 @@ public class BurrowsWheeler {
         }
         BinaryStdOut.write(number);
         BinaryStdOut.write(stringBuilder.toString(), 8);
+        BinaryStdOut.close();
     }
 
     public static void inverseTransform() {
         int start = BinaryStdIn.readInt();
         if (BinaryStdIn.isEmpty()) return;
-        t = BinaryStdIn.readString().toCharArray();
-        Custom[] customs = new Custom[t.length];
+        char[] t = BinaryStdIn.readString().toCharArray();
+        int[] index = new int[t.length];
+        char[] tOrder = new char[t.length];
+        int[] count = new int[256 + 1];
         for (int i = 0; i < t.length; i++) {
-            customs[i] = new Custom(i, t[i]);
+            count[t[i] + 1]++;
         }
-        Arrays.sort(customs);
+        for (int i = 0; i < 256; i++) {
+            count[i + 1] += count[i];
+        }
+        for (int i = 0; i < t.length; i++) {
+            index[count[t[i]]] = i;
+            tOrder[count[t[i]]++] = t[i];
+        }
         int j = start;
         for (int i = 0; i < t.length; i++) {
-            if (i == 0) j = start;
-            BinaryStdOut.write(customs[j].getB(), 8);
-            j = customs[j].getI();
+            BinaryStdOut.write(tOrder[j]);
+            j = index[j];
         }
-    }
-
-    private static class Custom implements Comparable<Custom> {
-        private int i;
-        private char b;
-
-        private Custom(int i, char b) {
-            this.i = i;
-            this.b = b;
-        }
-
-        private int getI() {
-            return i;
-        }
-
-        private char getB() {
-            return b;
-        }
-
-        @Override
-        public int compareTo(Custom o) {
-            return t[this.getI()] > t[o.getI()] ? 1 : t[this.getI()] < t[o.getI()] ? -1 : 0;
-        }
+        BinaryStdOut.close();
     }
 
     public static void main(String[] args) {
