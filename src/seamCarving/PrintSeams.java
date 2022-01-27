@@ -40,7 +40,6 @@ package seamCarving;
  *
  ******************************************************************************/
 
-import edu.princeton.cs.algs4.Picture;
 import edu.princeton.cs.algs4.StdOut;
 
 public class PrintSeams {

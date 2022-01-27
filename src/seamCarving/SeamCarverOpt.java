@@ -1,6 +1,5 @@
 package seamCarving;
 
-import edu.princeton.cs.algs4.Picture;
 
 public class SeamCarverOpt {
     private int[] img;
@@ -153,7 +152,8 @@ public class SeamCarverOpt {
     }
 
     public void removeVerticalSeam(int[] seam) {
-        if (seam == null || seam.length != height() || width() <= 1) throw new IllegalArgumentException();
+        if (seam == null || seam.length != height() || width() <= 1)
+            throw new IllegalArgumentException();
         for (int i = 0; i < height(); i++) {
             if (seam[i] >= width() || seam[i] < 0) {
                 throw new IllegalArgumentException();
