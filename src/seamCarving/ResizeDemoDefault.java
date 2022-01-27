@@ -29,7 +29,6 @@ public class ResizeDemoDefault {
             sc.removeVerticalSeam(verticalSeam);
         }
         Picture outputImg = sc.picture();
-
         StdOut.printf("new image size is %d columns by %d rows\n", sc.width(), sc.height());
 
         StdOut.println("Resizing time: " + sw.elapsedTime() + " seconds.");
